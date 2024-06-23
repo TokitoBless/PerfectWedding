@@ -9,6 +9,4 @@ $Conexion = new mysqli($host, $user, $pass, $db);
 
 if(!$Conexion){
     echo "Conexion fallida";
-}else{
-    echo "Conexion exitosa";
 }

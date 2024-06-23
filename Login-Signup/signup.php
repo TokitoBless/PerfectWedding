@@ -1,7 +1,8 @@
 <?php
 
 session_start();
-include('../Conexion/conexion.php');
+include_once('../Conexion/conexion.php');
+
 
 if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeMaterno']) && isset($_POST['Correo']) && isset($_POST['TipoUsuario'])&& isset($_POST['Contraseña'])) {
     function validar($data){
@@ -18,15 +19,31 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
     $TipoUsuario = validar($_POST['TipoUsuario']);
     $Contraseña = validar($_POST['Contraseña']);
 
-    $Usuario = 
+    $Usuario = $Nombre . $ApePaterno . $ApeMaterno[0];
+    $Estatus = "Inactivo";
 
-    $VerificarUsuario = "SELECT * FROM usuarios WHERE correo = '$Correo'";
-    $queryVeriUsuario = $conexion->query($VerificarUsuario);
+    $CodigoConfirmacion = rand(10000, 99999);
+    $FechaRegistro = date("Y-m-d H:i:s"); 
+
+    echo $FechaRegistro;
+
+    $sqlVerificarUsuario = "SELECT * FROM usuarios WHERE correo = '$Correo'";
+    $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
 
     if(mysqli_num_rows($queryVeriUsuario) > 0){
         header('location:signup.php?error="El usuario ya existe"');
+        exit();
     }else {
-        $sqlIngresarUsuario = "INSERT INTO usuarios`(tipoUsuario, usuario, nombre, apellidoPaterno, apellidoMaterno, correo, contraseña, codigo, estatus, fechaRegistro) VALUES";
+        $sqlIngresarUsuario = "INSERT INTO usuarios (tipoUsuario, usuario, nombre, apellidoPaterno, apellidoMaterno, correo, contraseña, codigo, estatus, fechaRegistro) VALUES ('$TipoUsuario', '$Usuario', '$Nombre', '$ApePaterno', '$ApeMaterno', '$Correo', '$Contraseña', '$CodigoConfirmacion', '$Estatus', '$FechaRegistro')";
+        $queryIngresarUsu = $Conexion->query($sqlIngresarUsuario);
+
+        if ($queryIngresarUsu) {
+            header('location:signup.php?success="Usuario creado"');
+            exit();
+        }else {
+            header('location:signup.php?success="Hubo un error en la creacion"');
+            exit();
+        }
     }
 
 }

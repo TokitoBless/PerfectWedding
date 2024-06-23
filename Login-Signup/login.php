@@ -19,20 +19,22 @@
 </nav>
 <br>
 
-    <center>
-        <h1>Log in</h1>
-        <p>No tienes cuenta? <a href="signup.php">Sign up</a></p>
+  <center>
+    <h1>Log in</h1>
+    <p>No tienes cuenta? <a href="signup.php">Sign up</a></p>
 <br><br>
-        <form action="login.php" method="POST">
+    <form action="login.php" method="POST">
 
-            <label>Usuario</label>
-            <br>
-            <input type="text" name="Usuario" placeholder="Usuario" required>
-            <br><br>
-            <label>Contraseña</label>
-            <br>
-            <input type="password" name="Contraseña" placeholder="Contraseña" required>
-        </form>
-    </center>  
+      <label>Usuario</label>
+      <br>
+      <input type="text" name="Usuario" placeholder="Usuario" required>
+      <br><br>
+      <label>Contraseña</label>
+      <br>
+      <input type="password" name="Contraseña" placeholder="Contraseña" required>
+<br><br><br>
+      <button class="btn btn-dark" type="submit">Log in</button>
+    </form>
+  </center>  
 </body>
 </html>
