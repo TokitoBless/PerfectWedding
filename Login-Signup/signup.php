@@ -25,8 +25,6 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
     $CodigoConfirmacion = rand(10000, 99999);
     $FechaRegistro = date("Y-m-d H:i:s"); 
 
-    echo $FechaRegistro;
-
     $sqlVerificarUsuario = "SELECT * FROM usuarios WHERE correo = '$Correo'";
     $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
 
@@ -37,8 +35,14 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         $sqlIngresarUsuario = "INSERT INTO usuarios (tipoUsuario, usuario, nombre, apellidoPaterno, apellidoMaterno, correo, contraseña, codigo, estatus, fechaRegistro) VALUES ('$TipoUsuario', '$Usuario', '$Nombre', '$ApePaterno', '$ApeMaterno', '$Correo', '$Contraseña', '$CodigoConfirmacion', '$Estatus', '$FechaRegistro')";
         $queryIngresarUsu = $Conexion->query($sqlIngresarUsuario);
 
+        $sqlId = "SELECT MAX(id) AS max_id FROM usuarios";
+        $queryId = $Conexion->query($sqlId);
+        
+        $row = mysqli_fetch_row($queryId);
+        $max_id = $row[0];
+
         if ($queryIngresarUsu) {
-            header('location:signup.php?success="Usuario creado"');
+            header('location:confirmarCorreo.php?success="Usuario creado&id=' . $max_id . '"');
             exit();
         }else {
             header('location:signup.php?success="Hubo un error en la creacion"');
@@ -99,13 +103,13 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         <div class="container text-center">
         <div class="row">
             <div class="col">
-            <input type="text" name="Nombre" placeholder="Nombre(s)" required>
+            <input type="text" name="Nombre" placeholder="Nombre(s)"  pattern="[A-Za-z]+" title="Solo se permiten letras" required>
             </div>
             <div class="col">
-            <input type="text" name="ApePaterno" placeholder="Apellido Paterno" required>
+            <input type="text" name="ApePaterno" placeholder="Apellido Paterno"  pattern="[A-Za-z]+" title="Solo se permiten letras" required>
             </div>
             <div class="col">
-            <input type="text" name="ApeMaterno" placeholder="Apellido Materno" required>
+            <input type="text" name="ApeMaterno" placeholder="Apellido Materno"  pattern="[A-Za-z]+" title="Solo se permiten letras" required>
             </div>
         </div>
         </div>
@@ -125,7 +129,7 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         <div class="container text-center">
         <div class="row">
             <div class="col">
-            <input type="email" name="Correo" placeholder="Correo electronico" required>
+            <input type="email" name="Correo" placeholder="Correo electronico"  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Ingrese un correo electrónico válido" required>
             </div>
             <div class="col">
             <select name="TipoUsuario"  required>
@@ -138,7 +142,7 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         </div>      
 
         <label>Contraseña</label><br>
-        <input type="password" name="Contraseña" placeholder="Contraseña" required>
+        <input type="password" name="Contraseña" placeholder="Contraseña" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}"  title="La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula, un número y un carácter especial." required>
         
         <br><br>
 
