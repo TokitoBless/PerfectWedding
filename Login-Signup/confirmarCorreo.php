@@ -3,8 +3,15 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['max_id'])) {
-    $Id = $_GET['max_id'];
-    
+  $Id = $_GET['max_id'];
+  $sqlInfo = "SELECT correo, codigo, fechaRegistro FROM usuarios WHERE id = $Id";
+  $queryInfo = $Conexion->query($sqlInfo);
+  
+  $row = mysqli_fetch_row($queryInfo);
+  $Correo = $row[0];
+  $Codigo = $row[1];
+  $Fecha = $row[2];
+  echo c
 }
 
 ?>

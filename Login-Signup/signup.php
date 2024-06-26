@@ -10,7 +10,7 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         $data = stripcslashes($data);
         $data = htmlspecialchars($data);
         return $data;
-    }   
+    }
 
     $Nombre = validar($_POST['Nombre']);
     $ApePaterno = validar($_POST['ApePaterno']);
@@ -41,6 +41,28 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         $row = mysqli_fetch_row($queryId);
         $max_id = $row[0];
 
+        $nombreEmpresa = 'PerfectWedding';
+        $destino = 'dianapdz09@gmail.com'; //correo del cliente
+        $asunto = 'Codigo de confirmacion';
+      
+        $contenido = '
+            <html> 
+                <body> 
+                    <h2>Este es su codigo de confirmacion para validar su correo electronico </h2>
+                    <p> 
+                        '.$CodigoConfirmacion.' 
+                    </p> 
+                </body>
+            </html>
+        ';
+        //para el envío en formato HTML 
+        $headers = "MIME-Version: 1.0\r\n"; 
+        $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+        //dirección del remitente
+        $headers .= "FROM: $nombreEmpresa <$Correo>\r\n";
+        mail($destino,$asunto,$contenido,$headers);
+        
         if ($queryIngresarUsu) {
             header('location:confirmarCorreo.php?success="Usuario creado&id=' . $max_id . '"');
             exit();
