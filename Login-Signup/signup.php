@@ -23,7 +23,8 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
     $Estatus = "Inactivo";
 
     $CodigoConfirmacion = rand(10000, 99999);
-    $FechaRegistro = date("Y-m-d H:i:s"); 
+    $fecha = new DateTime();
+    $FechaRegistro = $fecha->format('Y-m-d H:i:s'); 
 
     $sqlVerificarUsuario = "SELECT * FROM usuarios WHERE correo = '$Correo'";
     $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
@@ -64,7 +65,7 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         mail($destino,$asunto,$contenido,$headers);
         
         if ($queryIngresarUsu) {
-            header('location:confirmarCorreo.php?success="Usuario creado&id=' . $max_id . '"');
+            header('location:confirmarCorreo.php?success=Usuario creado&id=' . $max_id . '');
             exit();
         }else {
             header('location:signup.php?success="Hubo un error en la creacion"');

@@ -2,16 +2,38 @@
 
 include_once('../Conexion/conexion.php');
 
-if (isset($_GET['max_id'])) {
-  $Id = $_GET['max_id'];
-  $sqlInfo = "SELECT correo, codigo, fechaRegistro FROM usuarios WHERE id = $Id";
-  $queryInfo = $Conexion->query($sqlInfo);
+if (isset($_GET['id'])) {
+  $ID = $_GET['id'];
+  $codigo = null;
+  if (isset($_GET['codigo'])) {
+    $codigo = $_GET['codigo'];
+  }
   
+  
+  $sqlInfo = "SELECT codigo, fechaRegistro FROM usuarios WHERE id = $ID";
+  $queryInfo = $Conexion->query($sqlInfo);
+
   $row = mysqli_fetch_row($queryInfo);
-  $Correo = $row[0];
-  $Codigo = $row[1];
-  $Fecha = $row[2];
-  echo c
+  $codigoConfirmacion = $row[0];
+  $fecha = $row[1];
+
+  $fechaLimite = new DateTime($fecha);
+  $fechaLimite->modify('+5 minutes');
+  $fechaActual = new DateTime();
+
+  if ($fechaLimite > $fechaActual){
+    if ($codigo == $codigoConfirmacion) {
+      $sqlUpdate = "UPDATE usuarios SET estatus = 'Activo' WHERE id = '$ID'";
+      $queryUpdate = $Conexion->query($sqlUpdate);
+      header('location:login.php?success="Bienvenido"');
+      exit();
+    }else {
+      echo '<script language="javascript">alert("El codigo es incorrecto");</script>';
+    }
+  }else {
+    echo '<script language="javascript">alert("El tiempo del codigo ya expiro");</script>';
+  }
+
 }
 
 ?>
@@ -38,11 +60,12 @@ if (isset($_GET['max_id'])) {
 
 <div class="container">
     <center>
-    <form action="confirmarCorreo.php" method="POST">
+    <form action="confirmarCorreo.php" method="GET">
         <h3>Codigo de confirmacion</h3>
         <p>El codigo fue enviado a su correo electronico</p>
         <br>
         <input type="number" name="codigo" placeholder="Codigo de confirmacion" required style="width: 300px; padding: 5px; ">
+        <input type="hidden" name="id" id="id" value="<?php echo $ID?>">
         <br><br><br>
         <div class="d-grid gap-2 col-6 mx-auto">
         <button class="btn btn-dark" type="submit">Confirmar</button>
