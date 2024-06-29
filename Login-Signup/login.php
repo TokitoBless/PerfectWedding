@@ -1,3 +1,12 @@
+<?php
+
+if (isset($_POST['Usuario']) && isset($_POST['Contraseña']) ) {
+  $Usuario = $_POST['Usuario'];
+  $Contraseña = $_POST['Contraseña'];
+  echo $Usuario . "  " . $Contraseña;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +31,7 @@
   <center>
     <h1>Log in</h1>
     <p>No tienes cuenta? <a href="signup.php">Sign up</a></p>
-<br><br>
+<br>
     <form action="login.php" method="POST">
 
       <label>Usuario</label>

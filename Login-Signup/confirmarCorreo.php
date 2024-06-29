@@ -7,32 +7,63 @@ if (isset($_GET['id'])) {
   $codigo = null;
   if (isset($_GET['codigo'])) {
     $codigo = $_GET['codigo'];
-  }
-  
-  
-  $sqlInfo = "SELECT codigo, fechaRegistro FROM usuarios WHERE id = $ID";
-  $queryInfo = $Conexion->query($sqlInfo);
+    $sqlInfo = "SELECT codigo, fechaRegistro FROM usuarios WHERE id = $ID";
+    $queryInfo = $Conexion->query($sqlInfo);
 
-  $row = mysqli_fetch_row($queryInfo);
-  $codigoConfirmacion = $row[0];
-  $fecha = $row[1];
+    $row = mysqli_fetch_row($queryInfo);
+    $codigoConfirmacion = $row[0];
+    $fecha = $row[1];
 
-  $fechaLimite = new DateTime($fecha);
-  $fechaLimite->modify('+5 minutes');
-  $fechaActual = new DateTime();
+    $fechaLimite = new DateTime($fecha);
+    $fechaLimite->modify('+5 minutes');
+    $fechaActual = new DateTime();
 
-  if ($fechaLimite > $fechaActual){
-    if ($codigo == $codigoConfirmacion) {
-      $sqlUpdate = "UPDATE usuarios SET estatus = 'Activo' WHERE id = '$ID'";
-      $queryUpdate = $Conexion->query($sqlUpdate);
-      header('location:login.php?success="Bienvenido"');
-      exit();
+    if ($fechaLimite > $fechaActual){
+      if ($codigo == $codigoConfirmacion) {
+        $sqlUpdate = "UPDATE usuarios SET estatus = 'Activo' WHERE id = '$ID'";
+        $queryUpdate = $Conexion->query($sqlUpdate);
+        header('location:login.php?success="Bienvenido"');
+        exit();
+      }else {
+        echo '<script language="javascript">alert("El codigo es incorrecto");</script>';
+      }
     }else {
-      echo '<script language="javascript">alert("El codigo es incorrecto");</script>';
+      echo '<script language="javascript">alert("El tiempo del codigo ya expiro");</script>';
     }
-  }else {
-    echo '<script language="javascript">alert("El tiempo del codigo ya expiro");</script>';
   }
+  if(isset($_GET['reenviar'])){
+    $CodigoConfirmacion = rand(10000, 99999);
+    $fecha = new DateTime();
+    $FechaReenvio = $fecha->format('Y-m-d H:i:s'); 
+    
+    $sqlUpdate = "UPDATE usuarios SET codigo = '$CodigoConfirmacion', fechaRegistro = '$FechaReenvio' WHERE id = '$ID'";
+    $queryUpdate = $Conexion->query($sqlUpdate);
+
+    $nombreEmpresa = 'PerfectWedding';
+    $destino = 'dianapdz09@gmail.com'; //correo del cliente
+    $asunto = 'Reenvio de codigo de confirmacion';
+  
+    $contenido = '
+        <html> 
+            <body> 
+                <h2>Este es su codigo de confirmacion para validar su correo electronico </h2>
+                <p> 
+                    '.$CodigoConfirmacion.' 
+                </p> 
+            </body>
+        </html>
+    ';
+    //para el envío en formato HTML 
+    $headers = "MIME-Version: 1.0\r\n"; 
+    $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+    //dirección del remitente
+    $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+    mail($destino,$asunto,$contenido,$headers);
+    echo '<script language="javascript">alert("El codigo fue enviado a su correo por favor de verificarlo");</script>';
+  }
+  
+  
 
 }
 
@@ -68,9 +99,18 @@ if (isset($_GET['id'])) {
         <input type="hidden" name="id" id="id" value="<?php echo $ID?>">
         <br><br><br>
         <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-dark" type="submit">Confirmar</button>
-        <button class="btn btn-info" type="button">Reenviar codigo</button>
-    </div>
+            <button class="btn btn-dark" type="submit">Confirmar</button>
+        </div>
+    </form>
+
+    <br>
+
+    <form action="confirmarCorreo.php" method="GET">
+        <input type="hidden" name="id" id="id" value="<?php echo $ID?>">
+        <input type="hidden" name="reenviar" value="1">
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-info" type="submit">Reenviar código</button>
+        </div>
     </form>
     
     </center>
