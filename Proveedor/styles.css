@@ -1,0 +1,86 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+nav {
+    background: linear-gradient(to right, #FFF7AD, #FFA9F9);
+    width: 100%;
+    height: 55px; /* Altura de la imagen */
+    display: flex;
+    align-items: center;
+    padding-left: 10px; 
+}
+
+.container-fluid {
+    display: flex;
+    align-items: center;
+}
+
+.title_nav {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    margin-left: 50px;
+}
+
+.title_nav img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 5px; 
+}
+
+.form-container {
+    width: 50%; /* Ajusta este valor según tus necesidades */
+    min-width: 300px; /* Asegura que el formulario no sea demasiado pequeño */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+}
+
+.column {
+    flex: 1;
+}
+
+.column-full {
+    flex: 1;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.btn-submit {
+    background-color: #ED8484;
+    border: 2px solid #ED8484;
+    color: white;
+    padding: 5px 50px; 
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 20px;
+    right: 20px; 
+}
+
+.btn-submit:hover {
+    background-color: #ED8484 !important;
+    border-color: #ED8484 !important;
+}

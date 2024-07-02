@@ -157,7 +157,8 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
             <div class="col">
             <select name="TipoUsuario"  required>
                 <option value=""></option>
-                <option value="Novia o Novio">Novia o Novio</option>
+                <option value="Novia">Novia</option>
+                <option value="Novio">Novio</option>
                 <option value="Ayudante de boda">Ayudante de boda</option>
                 <option value="Proveedor">Proveedor</option>
             </select>

@@ -7,13 +7,13 @@ if (isset($_GET['id'])) {
   $codigo = null;
   if (isset($_GET['codigo'])) {
     $codigo = $_GET['codigo'];
-    $sqlInfo = "SELECT codigo, fechaRegistro FROM usuarios WHERE id = $ID";
+    $sqlInfo = "SELECT codigo, fechaRegistro, tipoUsuario FROM usuarios WHERE id = $ID";
     $queryInfo = $Conexion->query($sqlInfo);
 
     $row = mysqli_fetch_row($queryInfo);
     $codigoConfirmacion = $row[0];
     $fecha = $row[1];
-
+    $tipoUsuario = $row[2];
     $fechaLimite = new DateTime($fecha);
     $fechaLimite->modify('+5 minutes');
     $fechaActual = new DateTime();
@@ -22,8 +22,18 @@ if (isset($_GET['id'])) {
       if ($codigo == $codigoConfirmacion) {
         $sqlUpdate = "UPDATE usuarios SET estatus = 'Activo' WHERE id = '$ID'";
         $queryUpdate = $Conexion->query($sqlUpdate);
-        header('location:login.php?success="Bienvenido"');
-        exit();
+        if($tipoUsuario == "Ayudante de boda")
+        {
+          header('location:infoAyudante.php?success="Bienvenido"');
+          exit();
+        }elseif ($tipoUsuario == "Proveedor") {
+          header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor"');
+          exit();
+        }else {
+          header('location:login.php?success="Bienvenido novia/novio"');
+          exit();
+        }
+        
       }else {
         echo '<script language="javascript">alert("El codigo es incorrecto");</script>';
       }
@@ -109,7 +119,7 @@ if (isset($_GET['id'])) {
         <input type="hidden" name="id" id="id" value="<?php echo $ID?>">
         <input type="hidden" name="reenviar" value="1">
         <div class="d-grid gap-2 col-6 mx-auto">
-            <button class="btn btn-info" type="submit">Reenviar código</button>
+            <button class="btn btn-info btn-morado" type="submit">Reenviar código</button>
         </div>
     </form>
     

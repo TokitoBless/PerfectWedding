@@ -4,5 +4,17 @@ nav{
 .title_nav{
     font-size: 20px;
 }
+.btn-morado {
+    background-color: #800080 !important;
+    border-color: #800080 !important;
+    color: white !important; 
+}
+
+.btn-morado:hover {
+    background-color: #660066 !important; 
+    border-color: #660066 !important;
+}
+
+
 
 

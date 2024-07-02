@@ -20,8 +20,8 @@
 <br>
 
 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-<a class="btn btn-info" href="signup.php" role="button">Sign up</a>
-  <a class="btn btn-info" href="login.php" role="button">Log in</a>
+  <a class="btn btn-info btn-morado" href="signup.php" role="button">Sign up</a>
+  <a class="btn btn-info btn-morado" href="login.php" role="button">Log in</a>
 </div>
 <br>
 <div class="container">
