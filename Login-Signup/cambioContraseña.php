@@ -1,19 +1,11 @@
 <?php
 
-session_start();
-include_once('../Conexion/conexion.php');
-
-if (isset($_POST['Usuario']) && isset($_POST['Contraseña'])) {
-  $Usuario = $_POST['Usuario'];
-  $Contraseña = $_POST['Contraseña'];
-  
-
+if (isset($_POST['nuevaContraseña']) && isset($_POST['confirmarContraseña']) ) {
+  $Usuario = $_POST['nuevaContraseña'];
+  $Contraseña = $_POST['confirmarContraseña'];
+  echo $Usuario . "  " . $Contraseña;
 }
 ?>
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,21 +29,18 @@ if (isset($_POST['Usuario']) && isset($_POST['Contraseña'])) {
 <br>
 
   <center>
-    <h1>Log in</h1>
-    <p>No tienes cuenta? <a href="signup.php">Sign up</a></p>
+    <h1>Cambiar contraseña</h1>
 <br>
-    <form action="login.php" method="POST">
-
-      <label>Usuario</label>
+<form action="cambioContraseña.php" method="post">
+      <label>Nueva contraseña</label>
       <br>
-      <input type="text" name="Usuario" placeholder="Usuario" required>
+      <input type="passsword" name="nuevaContraseña" placeholder="Nueva" required>
       <br><br>
-      <label>Contraseña</label>
+      <label>Confirmar contraseña</label>
       <br>
-      <input type="password" name="Contraseña" placeholder="Contraseña" required>
-      <p class="text-body-secondary">No recuerdas tu contraseña?<br><a href="cambioContraseña.php">Cambiar contraseña</a></p>
-<br><br>
-      <button class="btn btn-dark" type="submit">Log in</button>
+      <input type="password" name="confirmarContraseña" placeholder="Confirmar" required>
+<br><br><br>
+      <button class="btn btn-dark" type="submit">Confirmar</button>
     </form>
   </center>  
 </body>

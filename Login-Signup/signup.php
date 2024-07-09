@@ -18,6 +18,7 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
     $Correo = validar($_POST['Correo']);
     $TipoUsuario = validar($_POST['TipoUsuario']);
     $Contraseña = validar($_POST['Contraseña']);
+    $ContraseñaHash = password_hash($Contraseña, PASSWORD_DEFAULT);
 
     $Usuario = $Nombre . $ApePaterno . $ApeMaterno[0];
     $Estatus = "Inactivo";
@@ -30,10 +31,10 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
     $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
 
     if(mysqli_num_rows($queryVeriUsuario) > 0){
-        header('location:signup.php?error="El usuario ya existe"');
+        header('location:signup.php?error="El correo ya esta siendo utilizado"');
         exit();
     }else {
-        $sqlIngresarUsuario = "INSERT INTO usuarios (tipoUsuario, usuario, nombre, apellidoPaterno, apellidoMaterno, correo, contraseña, codigo, estatus, fechaRegistro) VALUES ('$TipoUsuario', '$Usuario', '$Nombre', '$ApePaterno', '$ApeMaterno', '$Correo', '$Contraseña', '$CodigoConfirmacion', '$Estatus', '$FechaRegistro')";
+        $sqlIngresarUsuario = "INSERT INTO usuarios (tipoUsuario, usuario, nombre, apellidoPaterno, apellidoMaterno, correo, contraseña, codigo, estatus, fechaRegistro) VALUES ('$TipoUsuario', '$Usuario', '$Nombre', '$ApePaterno', '$ApeMaterno', '$Correo', '$ContraseñaHash', '$CodigoConfirmacion', '$Estatus', '$FechaRegistro')";
         $queryIngresarUsu = $Conexion->query($sqlIngresarUsuario);
 
         $sqlId = "SELECT MAX(id) AS max_id FROM usuarios";
