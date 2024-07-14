@@ -59,13 +59,13 @@ if (isset($_POST['apellidoPaterno']) && isset($_POST['apellidoMaterno']) && isse
     <title>Informacion de cuenta</title>
 </head>
 <body>
-<nav class="navbar bg-body-tertiary">
-  <div class="container-fluid">
-    <div class="title_nav">
-      <img src="../Imagenes/Wedding planner.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
-      <span>Perfect Wedding</span>
+<nav class="navbar navbar-simple bg-body-tertiary">
+    <div class="container-fluid">
+        <div class="title_nav">
+            <img src="../Imagenes/Wedding planner.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
+            <span>Perfect Wedding</span>
+        </div>
     </div>
-  </div>
 </nav>
 <br>
 <h3>Informacion de cuenta</h3>
