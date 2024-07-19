@@ -3,7 +3,7 @@ body {
     padding: 0;
     font-family: Arial, sans-serif;
 }
-
+/*Estilos para la navbar*/
 nav {
     background: linear-gradient(to right, #FFF7AD, #FFA9F9);
     width: 100%;
@@ -33,7 +33,7 @@ nav {
     justify-content: flex-start; /* Alinear elementos a la izquierda */
 }
 
-/* Estilos específicos para navbar-complex */
+/* Estilos específicos para navbar-menu */
 .navbar-complex .container-fluid {
     justify-content: space-between; /* Alinear elementos separados */
 }
@@ -55,8 +55,9 @@ nav {
     color: black;
 }
 
-.form-container {
-    width: 50%; /* Ajusta este valor según tus necesidades */
+/*Estilos para el formulario*/
+.form-container-perfil {
+    width: 100%; /* Ajusta este valor según tus necesidades */
     min-width: 300px; /* Asegura que el formulario no sea demasiado pequeño */
 }
 
@@ -70,14 +71,21 @@ form {
 .row {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap; /* Permite que los elementos se ajusten a la línea siguiente si no caben en una sola línea */
 }
 
 .column {
     flex: 1;
+    min-width: 200px; /* Ajusta el ancho mínimo según sea necesario */
 }
 
 .column-full {
     flex: 1;
+    min-width: 50%; /* Ocupa todo el ancho disponible */
+}
+
+.col-padding-10 .p-3 {
+    padding: 10px !important;
 }
 
 label {
@@ -99,7 +107,7 @@ input, select {
     border-radius: 5px;
     cursor: pointer;
     position: absolute;
-    bottom: 20px;
+    bottom: 5px;
     right: 20px; 
 }
 
@@ -107,3 +115,39 @@ input, select {
     background-color: #ED8484 !important;
     border-color: #ED8484 !important;
 }
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; /* Ajusta según sea necesario */
+    padding: 10px;
+}
+
+.btn-agregar {
+    background-color: #C47CA9 !important;
+    border-color: #C47CA9 !important;
+    color: white !important; 
+}
+
+.btn-agregar:hover {
+    background-color: #C47CA9 !important; 
+    border-color: #C47CA9 !important;
+}
+
+.star-container {
+    display: flex;
+    align-items: center;
+    margin-left: 150px;
+}
+
+.star-container img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px; /* Ajusta según sea necesario */
+}
+
+.calificacion {
+    margin-top: 100px; /* Ajusta este valor para el espacio deseado */
+}
+
