@@ -49,7 +49,7 @@ if (isset($_POST['Usuario']) && isset($_POST['Contraseña'])) {
       <label>Contraseña</label>
       <br>
       <input type="password" name="Contraseña" placeholder="Contraseña" required>
-      <p class="text-body-secondary">No recuerdas tu contraseña?<br><a href="cambioContraseña.php">Cambiar contraseña</a></p>
+      <p class="text-body-secondary">No recuerdas tu contraseña?<br><a href="correoContraseña.php">Cambiar contraseña</a></p>
 <br><br>
       <button class="btn btn-dark" type="submit">Log in</button>
     </form>

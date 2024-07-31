@@ -1,8 +1,3 @@
-<?php
-// Obtiene el ID del header desde la URL
-$id = isset($_GET['id']) ? $_GET['id'] : '';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,11 +5,10 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <title>Servicios</title>
+    <link rel="stylesheet" type="text/css" href="styleServicios.css">
+    <title>Agregar Servicios</title>
 </head>
 <body>
-
 <nav class="navbar navbar-complex navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
         <div class="title_nav">
@@ -36,10 +30,30 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
     </div>
 </nav>
 <br>
-<div class="header-container">
-    <h3>Servicios agregados</h3>
-    <a class="btn btn-info btn-agregar" type="submit" href="agregarServicio.php?id=<?php echo $id; ?>">Agregar</a>
-</div>
+<h3>Nuevo Servicio</h3>
+<br>
+
+<form action="agregarServicio.php" method="post">
+
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label class="col-form-label">Nombre del Servicio</label>
+        </div>
+        <div class="col-auto">
+            <input type="text" id="nombreServicio"required>
+        </div>
+    </div>
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label class="col-form-label">Descripcion</label>
+        </div>
+        <div class="col-auto">
+        <textarea id="descripcion" style="height: 100px" required></textarea>
+        </div>
+    </div>
+    <label>Imágenes</label>
+    <input class="input-group" type="file" name="user_image" accept="image/*" />
+</form>
 
 </body>
 </html>

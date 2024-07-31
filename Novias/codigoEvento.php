@@ -36,10 +36,7 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
     </div>
 </nav>
 <br>
-<div class="header-container">
-    <h3>Servicios agregados</h3>
-    <a class="btn btn-info btn-agregar" type="submit" href="agregarServicio.php?id=<?php echo $id; ?>">Agregar</a>
-</div>
+
 
 </body>
 </html>

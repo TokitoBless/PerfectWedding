@@ -30,12 +30,12 @@ nav {
 
 /* Estilos específicos para navbar-simple */
 .navbar-simple .container-fluid {
-    justify-content: flex-start; /* Alinear elementos a la izquierda */
+    justify-content: flex-start; 
 }
 
 /* Estilos específicos para navbar-menu */
 .navbar-complex .container-fluid {
-    justify-content: space-between; /* Alinear elementos separados */
+    justify-content: space-between; 
 }
 
 .navbar-complex .navbar-nav {
@@ -47,7 +47,7 @@ nav {
 }
 
 .navbar-complex .nav-item {
-    margin-right: 20px; /* Espacio entre elementos del menú */
+    margin-right: 20px; 
 }
 
 .navbar-complex .nav-item a {
@@ -57,8 +57,8 @@ nav {
 
 /*Estilos para el formulario*/
 .form-container-perfil {
-    width: 100%; /* Ajusta este valor según tus necesidades */
-    min-width: 300px; /* Asegura que el formulario no sea demasiado pequeño */
+    width: 100%;
+    min-width: 300px; 
 }
 
 form {
@@ -71,17 +71,17 @@ form {
 .row {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap; /* Permite que los elementos se ajusten a la línea siguiente si no caben en una sola línea */
+    flex-wrap: wrap; 
 }
 
 .column {
     flex: 1;
-    min-width: 200px; /* Ajusta el ancho mínimo según sea necesario */
+    min-width: 200px; 
 }
 
 .column-full {
     flex: 1;
-    min-width: 50%; /* Ocupa todo el ancho disponible */
+    min-width: 50%; 
 }
 
 .col-padding-10 .p-3 {
@@ -120,10 +120,11 @@ input, select {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px; /* Ajusta según sea necesario */
+    margin-bottom: 10px; 
     padding: 10px;
 }
 
+/*Pagina infoPerfil*/
 .btn-agregar {
     background-color: #C47CA9 !important;
     border-color: #C47CA9 !important;
@@ -144,10 +145,10 @@ input, select {
 .star-container img {
     width: 30px;
     height: 30px;
-    margin-right: 10px; /* Ajusta según sea necesario */
+    margin-right: 10px;
 }
 
 .calificacion {
-    margin-top: 100px; /* Ajusta este valor para el espacio deseado */
+    margin-top: 100px; 
 }
 

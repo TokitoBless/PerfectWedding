@@ -30,7 +30,7 @@ if (isset($_GET['id'])) {
           header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor"');
           exit();
         }else {
-          header('location:login.php?success="Bienvenido novia/novio"');
+          header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
           exit();
         }
         
