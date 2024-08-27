@@ -1,3 +1,66 @@
+<?php
+include_once('../Conexion/conexion.php');
+
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    $sql = "SELECT * FROM proveedores WHERE id = '$id'";
+    $result = $Conexion->query($sql);
+    $proveedor = $result->fetch_assoc();
+} else {
+    // Redirigir si no hay ID de proveedor
+    header('Location: agregarServicio.php?error="No se proporcionó ID de proveedor"');
+    exit();
+}
+
+if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_POST['precioServicio']) && isset($_POST['categoria']) && isset($_POST['palabraClave'])) {
+    function validar($data){
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
+    }
+
+    $NombreServicio = validar($_POST['nombreServicio']);
+    $Descripcion = validar($_POST['descripcion']);
+    $PrecioServicio = validar($_POST['precioServicio']);
+    $Categoria = validar($_POST['categoria']);
+    $PalabraClave = validar($_POST['palabraClave']);
+
+    /* Manejo las imagenes*/
+
+    if (!isset($_FILES['imagen1']['tmp_name']) || $_FILES['imagen1']['error'] != UPLOAD_ERR_OK) {
+        echo "Por favor seleccione una imagen en el primer campo";
+        exit();
+    }
+    
+    $imagen = file_get_contents($_FILES['imagen1']['tmp_name']);
+    $imagen = $Conexion->real_escape_string($imagen);
+
+    $imagenes = [];//null como default
+    for ($i = 2; $i <= 5; $i++) {
+        $imagenes["imagen$i"] = null;
+    }
+    
+    for ($i = 2; $i <= 5; $i++) {//se agregan las imagenes que si se pusieron
+        $numeroImagen = "imagen$i";
+        if (isset($_FILES[$numeroImagen]['tmp_name']) && $_FILES[$numeroImagen]['error'] == UPLOAD_ERR_OK) {
+            $imagenes[$numeroImagen] = file_get_contents($_FILES[$numeroImagen]['tmp_name']);
+            $imagenes[$numeroImagen] = $Conexion->real_escape_string($imagenes[$numeroImagen]);
+        }
+    }
+    
+    $sql = "INSERT INTO servicios (proveedor, nombreServicio, descripcion, precio, categoria, palabraClave, imagen1, imagen2, imagen3, imagen4, imagen5) VALUES ( '$id', '$NombreServicio', '$Descripcion', '$PrecioServicio', '$Categoria', '$PalabraClave', '$imagen', '{$imagenes['imagen2']}', '{$imagenes['imagen3']}', '{$imagenes['imagen4']}', '{$imagenes['imagen5']}')";
+    $query = $Conexion->query($sql);
+
+    if ($query) {
+        echo '<script language="javascript">alert("Se agrego un servicio exitosamente");window.location.href = "panelServicios.php?id=' . $id . '";</script>';
+        
+    } else {
+        echo "Error: " . $sql . "<br>" . $Conexion->error;
+    }
+}
+?>
 
 
 
@@ -35,82 +98,76 @@
 <br>
 <h3>Nuevo Servicio</h3>
 
-<form action="agregarServicio.php" method="post">
+<form action="agregarServicio.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
 <div class="container">
   <div class="row align-items-start">
     <div class="col">
         <label>Nombre del Servicio</label><br>
-        <input type="text" name="nombreServicio"required>
+        <input type="text" name="nombreServicio" pattern="[A-Za-z]+" title="Solo se permiten letras" required>
     <br><br>
         <label>Descripcion</label><br>
-        <textarea name="descripcion" style="height: 100px" required></textarea>
+        <textarea name="descripcion" style="height: 100px"  required></textarea>
     <br><br>
         <label>Precio del Servicio</label><br>
-        $ <input type="number" name="precioServicio"required>
+        $<input type="text" name="precioServicio" pattern="^(?!0{2,})\d{2,}$" title="El precio debe ser un número con al menos 2 dígitos" required>
     <br><br>
     </div>
     <div class="col">
-        <label for="img">Imágenes (Máximo 5)</label>
-        <div id="contenedor-imagenes">
-            <div class="subida-imagen">
-                <input type="file" name="img[]" accept="image/*" required>
-            </div>
+    <label for="img">Imágenes (Máximo 5)</label>
+    <div id="contenedor-imagenes">
+        <div class="subida-imagen">
+            <input type="file" name="imagen1" accept="image/*" required>
         </div>
-        <br>
-        <button type="button" id="boton-agregar-imagen" class="btn">Añadir otra imagen</button>
+    </div>
+    <br>
+    <button type="button" id="boton-agregar-imagen" class="btn">Añadir otra imagen</button>
+    <br><br>
 
-        <script>
-        document.getElementById('boton-agregar-imagen').addEventListener('click', function() {
-            // Obtener el contenedor de imágenes
-            const contenedor = document.getElementById('contenedor-imagenes');
-            
-            // Contar cuántos campos de imagen hay
-            const cantidadImagenesActual = contenedor.querySelectorAll('.subida-imagen').length;
+<script>
+document.getElementById('boton-agregar-imagen').addEventListener('click', function() {
+    const contenedor = document.getElementById('contenedor-imagenes');
+    const cantidadImagenesActual = contenedor.querySelectorAll('.subida-imagen').length;
 
-            // Si hay menos de 5, añadir uno nuevo
-            if (cantidadImagenesActual < 5) {
-                // Crear un nuevo contenedor
-                const envoltura = document.createElement('div');
-                envoltura.className = 'subida-imagen';
+    if (cantidadImagenesActual < 5) {
+        const envoltura = document.createElement('div');
+        envoltura.className = 'subida-imagen';
 
-                const nuevoCampoImagen = document.createElement('input');
-                nuevoCampoImagen.type = 'file';
-                nuevoCampoImagen.name = 'img[]';
-                nuevoCampoImagen.accept = 'image/*';
+        const nuevoCampoImagen = document.createElement('input');
+        nuevoCampoImagen.type = 'file';
+        nuevoCampoImagen.name = `imagen${cantidadImagenesActual + 1}`;// Incrementar el nombre
+        nuevoCampoImagen.accept = 'image/*';
 
-                // Añadir un botón para eliminar
-                if (cantidadImagenesActual > 0) {
-                    const botonEliminar = document.createElement('img');
-                    botonEliminar.src = '../Imagenes/eliminar.png'; 
-                    botonEliminar.alt = 'Eliminar';
-                    botonEliminar.style.cursor = 'pointer'; 
-                    botonEliminar.width = 20;
-                    botonEliminar.height = 20;
+        if (cantidadImagenesActual > 0) {
+            const botonEliminar = document.createElement('img');
+            botonEliminar.src = '../Imagenes/eliminar.png'; 
+            botonEliminar.alt = 'Eliminar';
+            botonEliminar.style.cursor = 'pointer'; 
+            botonEliminar.width = 20;
+            botonEliminar.height = 20;
 
-                    botonEliminar.addEventListener('click', function() {
-                        envoltura.remove(); // Elimina el campo
-                        actualizarBotonAgregar(); // Actualiza cuántos campos hay
-                    });
+            botonEliminar.addEventListener('click', function() {
+                envoltura.remove();
+                actualizarBotonAgregar();
+            });
 
-                    envoltura.appendChild(botonEliminar); // Añadir el botón eliminar
-                }
-
-                envoltura.appendChild(nuevoCampoImagen); // Añadir el campo de imagen
-                contenedor.appendChild(envoltura); // Añadir el contenedor
-
-                actualizarBotonAgregar(); // Actualiza cuántos campos hay
-            }
-        });
-
-        function actualizarBotonAgregar() {
-            const contenedor = document.getElementById('contenedor-imagenes');
-            const cantidadImagenesActual = contenedor.querySelectorAll('.subida-imagen').length;
-            const botonAgregar = document.getElementById('boton-agregar-imagen');
-
-            // Desactivar el botón si hay 5 o más campos
-            botonAgregar.disabled = cantidadImagenesActual >= 5;
+            envoltura.appendChild(botonEliminar);
         }
-        </script>
+
+        envoltura.appendChild(nuevoCampoImagen);
+        contenedor.appendChild(envoltura);
+
+        actualizarBotonAgregar();
+    }
+});
+
+function actualizarBotonAgregar() {
+    const contenedor = document.getElementById('contenedor-imagenes');
+    const cantidadImagenesActual = contenedor.querySelectorAll('.subida-imagen').length;
+    const botonAgregar = document.getElementById('boton-agregar-imagen');
+
+    botonAgregar.disabled = cantidadImagenesActual >= 5;
+}
+</script>
 
         <br><br>
 
@@ -193,7 +250,45 @@
     <br>
     <button class="btn-submit"  type="submit">Agregar</button>
 </center>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formulario = document.querySelector('form');
+    const campos = formulario.querySelectorAll('input, textarea, select');
+    const botonEnviar = document.querySelector('.btn-submit');
 
+    function comprobarForm() {
+        let formularioValido = true;
+
+        campos.forEach(campo => {
+            if (campo.type === 'file') {
+                if (campo.files.length === 0) {
+                    formularioValido = false;
+                }
+            } else if (campo.value.trim() === '') {
+                formularioValido = false;
+            }
+        });
+
+        const palabraClaveSelect = document.getElementById('palabraClaveSelect');
+        if (palabraClaveSelect && palabraClaveSelect.value.trim() === '') {
+            formularioValido = false;
+        }
+
+        botonEnviar.disabled = !formularioValido;
+    }
+
+    campos.forEach(campo => {
+        campo.addEventListener('input', comprobarForm);
+        campo.addEventListener('change', comprobarForm);
+    });
+
+    document.addEventListener('change', comprobarForm);
+
+    // Llamar a la función una vez para establecer el estado inicial del botón
+    comprobarForm();
+});
+
+</script>
 </form>
 
 </body>

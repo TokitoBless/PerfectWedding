@@ -3,6 +3,7 @@ body {
     padding: 0;
     font-family: Arial, sans-serif;
 }
+
 /*Estilos para la navbar*/
 nav {
     background: linear-gradient(to right, #FFF7AD, #FFA9F9);
@@ -35,7 +36,7 @@ nav {
 
 /* Estilos específicos para navbar-menu */
 .navbar-complex .container-fluid {
-    justify-content: space-between; 
+    justify-content: space-between; /* Alinear elementos separados */
 }
 
 .navbar-complex .navbar-nav {
@@ -47,7 +48,7 @@ nav {
 }
 
 .navbar-complex .nav-item {
-    margin-right: 20px; 
+    margin-right: 20px; /* Espacio entre elementos del menú */
 }
 
 .navbar-complex .nav-item a {
@@ -85,9 +86,14 @@ form{
     border-radius: 5px;
     cursor: pointer;
 }
-.btn-submit:hover {
+.btn-submit:hover:enabled {
     background-color: #ffbd59;
     color: white;
+}
+.btn-submit:disabled {
+    background-color: #CCCCCC;
+    border-color: #CCCCCC;
+    cursor: not-allowed; /* Cambia el cursor a no permitido */
 }
 
 select {
