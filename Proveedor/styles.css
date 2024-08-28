@@ -152,3 +152,44 @@ input, select {
     margin-top: 100px; 
 }
 
+/*Panel Servicios*/
+.card-container {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 10px;
+    padding-left: 30px;
+}
+
+.card {
+    flex-shrink: 0;
+    width: calc(16.66% - 10px); 
+    display: flex;
+    flex-direction: column;
+}
+.card-img-container {
+    width: 100%; 
+    height: 250px; 
+    display: flex;
+    align-items: center;
+}
+
+.card-img-top {
+    max-width: 100%; /* La imagen se ajusta al ancho del contenedor */
+    max-height: 100%; /* La imagen se ajusta a la altura del contenedor */
+    object-fit: contain; /* Mantiene la proporción de la imagen sin recortar */
+}
+
+/* En pantallas más pequeñas */
+@media (max-width: 768px) {
+    .card {
+        width: calc(33.33% - 10px); 
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        width: calc(50% - 10px); 
+    }
+}
+
+

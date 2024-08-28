@@ -4,8 +4,8 @@ include_once('../Conexion/conexion.php');
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
-    $sql = "SELECT * FROM proveedores WHERE id = '$id'";
-    $result = $Conexion->query($sql);
+    $sqlProveedor = "SELECT * FROM proveedores WHERE id = '$id'";
+    $result = $Conexion->query($sqlProveedor);
     $proveedor = $result->fetch_assoc();
 } else {
     // Redirigir si no hay ID de proveedor
@@ -50,14 +50,14 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
         }
     }
     
-    $sql = "INSERT INTO servicios (proveedor, nombreServicio, descripcion, precio, categoria, palabraClave, imagen1, imagen2, imagen3, imagen4, imagen5) VALUES ( '$id', '$NombreServicio', '$Descripcion', '$PrecioServicio', '$Categoria', '$PalabraClave', '$imagen', '{$imagenes['imagen2']}', '{$imagenes['imagen3']}', '{$imagenes['imagen4']}', '{$imagenes['imagen5']}')";
-    $query = $Conexion->query($sql);
+    $sqlAgregar = "INSERT INTO servicios (proveedor, nombreServicio, descripcion, precio, categoria, palabraClave, imagen1, imagen2, imagen3, imagen4, imagen5) VALUES ( '$id', '$NombreServicio', '$Descripcion', '$PrecioServicio', '$Categoria', '$PalabraClave', '$imagen', '{$imagenes['imagen2']}', '{$imagenes['imagen3']}', '{$imagenes['imagen4']}', '{$imagenes['imagen5']}')";
+    $queryAgregar = $Conexion->query($sqlAgregar);
 
-    if ($query) {
+    if ($queryAgregar) {
         echo '<script language="javascript">alert("Se agrego un servicio exitosamente");window.location.href = "panelServicios.php?id=' . $id . '";</script>';
         
     } else {
-        echo "Error: " . $sql . "<br>" . $Conexion->error;
+        echo "Error: " . $sqlAgregar . "<br>" . $Conexion->error;
     }
 }
 ?>
@@ -103,7 +103,7 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
   <div class="row align-items-start">
     <div class="col">
         <label>Nombre del Servicio</label><br>
-        <input type="text" name="nombreServicio" pattern="[A-Za-z]+" title="Solo se permiten letras" required>
+        <input type="text" name="nombreServicio" pattern="[A-Za-z\s]+" title="Solo se permiten letras" required>
     <br><br>
         <label>Descripcion</label><br>
         <textarea name="descripcion" style="height: 100px"  required></textarea>
