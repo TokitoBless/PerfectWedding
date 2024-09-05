@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $SitioWeb = isset($_POST['sitioWeb']) ? validar($_POST['sitioWeb']) : null;
     $Calificacion = $_POST['calificacion'];
 
-    $sqlActualizar = "UPDATE proveedores SET apellidoPaterno = '$ApellidoPaterno', apellidoMaterno = '$ApellidoMaterno', nombre = '$Nombre', nombreEmpresa = '$NombreEmpresa', ciudad = '$Ciudad', estado = '$Estado', telefono = '$Telefono', sitioWeb = '$SitioWeb', calificacion = '$Calificacion' WHERE id = '$id'";
+    $sqlActualizar = "UPDATE proveedores SET apellidoPaterno = '$ApellidoPaterno', apellidoMaterno = '$ApellidoMaterno', nombre = '$Nombre', nombreEmpresa = '$NombreEmpresa', ciudad = '$Ciudad', estado = '$Estado', telefono = '$Telefono', sitioWeb = '$SitioWeb' WHERE id = '$id'";
     $result = $Conexion->query($sqlActualizar);
 
     if ($result) {
@@ -119,7 +119,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <select id="estado" name="estado" required>
                         <option value="">Selecciona un estado</option>
                         <option value="Aguascalientes" <?php if ($proveedor['estado'] == 'Aguascalientes') echo 'selected'; ?>>Aguascalientes</option>
-                        <!-- Agregar las demás opciones de estado aquí -->
+                        <option value="Baja California" <?php if ($proveedor['estado'] == 'Baja California') echo 'selected'; ?>>Baja California</option>
+                        <option value="Baja California Sur" <?php if ($proveedor['estado'] == 'Baja California Sur') echo 'selected'; ?>>Baja California Sur</option>
+                        <option value="Campeche" <?php if ($proveedor['estado'] == 'Campeche') echo 'selected'; ?>>Campeche</option>
+                        <option value="Chiapas" <?php if ($proveedor['estado'] == 'Chiapas') echo 'selected'; ?>>Chiapas</option>
+                        <option value="Chihuahua" <?php if ($proveedor['estado'] == 'Chihuahua') echo 'selected'; ?>>Chihuahua</option>
+                        <option value="Coahuila" <?php if ($proveedor['estado'] == 'Coahuila') echo 'selected'; ?>>Coahuila</option>
+                        <option value="Colima" <?php if ($proveedor['estado'] == 'Colima') echo 'selected'; ?>>Colima</option>
+                        <option value="Durango" <?php if ($proveedor['estado'] == 'Durango') echo 'selected'; ?>>Durango</option>
+                        <option value="Guanajuato" <?php if ($proveedor['estado'] == 'Guanajuato') echo 'selected'; ?>>Guanajuato</option>
+                        <option value="Guerrero" <?php if ($proveedor['estado'] == 'Guerrero') echo 'selected'; ?>>Guerrero</option>
+                        <option value="Hidalgo" <?php if ($proveedor['estado'] == 'Hidalgo') echo 'selected'; ?>>Hidalgo</option>
+                        <option value="Jalisco" <?php if ($proveedor['estado'] == 'Jalisco') echo 'selected'; ?>>Jalisco</option>
+                        <option value="México" <?php if ($proveedor['estado'] == 'México') echo 'selected'; ?>>México</option>
+                        <option value="Michoacán" <?php if ($proveedor['estado'] == 'Michoacán') echo 'selected'; ?>>Michoacán</option>
+                        <option value="Morelos" <?php if ($proveedor['estado'] == 'Morelos') echo 'selected'; ?>>Morelos</option>
+                        <option value="Nayarit" <?php if ($proveedor['estado'] == 'Nayarit') echo 'selected'; ?>>Nayarit</option>
+                        <option value="Nuevo León" <?php if ($proveedor['estado'] == 'Nuevo León') echo 'selected'; ?>>Nuevo León</option>
+                        <option value="Oaxaca" <?php if ($proveedor['estado'] == 'Oaxaca') echo 'selected'; ?>>Oaxaca</option>
+                        <option value="Puebla" <?php if ($proveedor['estado'] == 'Puebla') echo 'selected'; ?>>Puebla</option>
+                        <option value="Querétaro" <?php if ($proveedor['estado'] == 'Querétaro') echo 'selected'; ?>>Querétaro</option>
+                        <option value="Quintana Roo" <?php if ($proveedor['estado'] == 'Quintana Roo') echo 'selected'; ?>>Quintana Roo</option>
+                        <option value="San Luis Potosí" <?php if ($proveedor['estado'] == 'San Luis Potosí') echo 'selected'; ?>>San Luis Potosí</option>
+                        <option value="Sinaloa" <?php if ($proveedor['estado'] == 'Sinaloa') echo 'selected'; ?>>Sinaloa</option>
+                        <option value="Sonora" <?php if ($proveedor['estado'] == 'Sonora') echo 'selected'; ?>>Sonora</option>
+                        <option value="Tabasco" <?php if ($proveedor['estado'] == 'Tabasco') echo 'selected'; ?>>Tabasco</option>
+                        <option value="Tamaulipas" <?php if ($proveedor['estado'] == 'Tamaulipas') echo 'selected'; ?>>Tamaulipas</option>
+                        <option value="Tlaxcala" <?php if ($proveedor['estado'] == 'Tlaxcala') echo 'selected'; ?>>Tlaxcala</option>
+                        <option value="Veracruz" <?php if ($proveedor['estado'] == 'Veracruz') echo 'selected'; ?>>Veracruz</option>
+                        <option value="Yucatán" <?php if ($proveedor['estado'] == 'Yucatán') echo 'selected'; ?>>Yucatán</option>
+                        <option value="Zacatecas" <?php if ($proveedor['estado'] == 'Zacatecas') echo 'selected'; ?>>Zacatecas</option>
+
                     </select>
                 </div>
             </div>

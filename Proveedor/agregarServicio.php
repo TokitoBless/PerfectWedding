@@ -26,6 +26,7 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
     $PrecioServicio = validar($_POST['precioServicio']);
     $Categoria = validar($_POST['categoria']);
     $PalabraClave = validar($_POST['palabraClave']);
+    $calificacion = 0;
 
     /* Manejo las imagenes*/
 
@@ -50,7 +51,7 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
         }
     }
     
-    $sqlAgregar = "INSERT INTO servicios (proveedor, nombreServicio, descripcion, precio, categoria, palabraClave, imagen1, imagen2, imagen3, imagen4, imagen5) VALUES ( '$id', '$NombreServicio', '$Descripcion', '$PrecioServicio', '$Categoria', '$PalabraClave', '$imagen', '{$imagenes['imagen2']}', '{$imagenes['imagen3']}', '{$imagenes['imagen4']}', '{$imagenes['imagen5']}')";
+    $sqlAgregar = "INSERT INTO servicios (proveedor, nombreServicio, descripcion, precio, categoria, palabraClave, calificacion, imagen1, imagen2, imagen3, imagen4, imagen5) VALUES ( '$id', '$NombreServicio', '$Descripcion', '$PrecioServicio', '$Categoria', '$PalabraClave', '$calificacion', '$imagen', '{$imagenes['imagen2']}', '{$imagenes['imagen3']}', '{$imagenes['imagen4']}', '{$imagenes['imagen5']}')";
     $queryAgregar = $Conexion->query($sqlAgregar);
 
     if ($queryAgregar) {
@@ -123,7 +124,7 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
     <button type="button" id="boton-agregar-imagen" class="btn">Añadir otra imagen</button>
     <br><br>
 
-<script>
+<script> //Imagenes
 document.getElementById('boton-agregar-imagen').addEventListener('click', function() {
     const contenedor = document.getElementById('contenedor-imagenes');
     const cantidadImagenesActual = contenedor.querySelectorAll('.subida-imagen').length;
@@ -214,7 +215,7 @@ function actualizarBotonAgregar() {
             <label>Palabras clave</label>
             <div id="listaPalabras"></div>
             
-        <script>
+        <script>//Palabras claves
             function cargarPalabrasClaves() {
                 const categoriaSeleccionada = document.getElementById('categoriaSelect').value;
 
@@ -250,7 +251,7 @@ function actualizarBotonAgregar() {
     <br>
     <button class="btn-submit"  type="submit">Agregar</button>
 </center>
-<script>
+<script>//Validar boton de agregar
 document.addEventListener('DOMContentLoaded', function() {
     const formulario = document.querySelector('form');
     const campos = formulario.querySelectorAll('input, textarea, select');

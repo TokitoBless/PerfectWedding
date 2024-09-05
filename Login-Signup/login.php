@@ -8,88 +8,109 @@ function verificarCredenciales($Usuario, $Contraseña) {
     global $Conexion; 
     global $estatusInactivo;
 
-    $sqlVerificarCuenta = "SELECT * FROM usuarios WHERE usuario = '$Usuario' AND contraseña = '$Contraseña'";
-    $queryVeriCuenta = $Conexion->query($sqlVerificarCuenta);
+    // 1. Verificar si existe el usuario
+    $sqlVerificarUsuario = "SELECT * FROM usuarios WHERE usuario = '$Usuario'";
+    $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
 
-    if (mysqli_num_rows($queryVeriCuenta) > 0) { // Existe la cuenta
-        header('location:index.php?success="Bienvenido al merequetengue"');
-        exit();
-    } else {
-        $sqlVerificarUsuario = "SELECT * FROM usuarios WHERE usuario = '$Usuario'";
-        $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
+    if (mysqli_num_rows($queryVeriUsuario) > 0) {
+        // El usuario existe
+        $fila = $queryVeriUsuario->fetch_assoc();
+        $contraseñaHash = $fila['contraseña'];
+        $estatusUsuario = $fila['estatus'];
+        $tipoUsuario = $fila['tipoUsuario'];
+        $id = $fila['id']; // Asumiendo que 'id' es el identificador del usuario
 
-        if (mysqli_num_rows($queryVeriUsuario) > 0) { // El usuario es correcto
-            $fila = $queryVeriUsuario->fetch_assoc();
-            $contraseñaHash = $fila['contraseña'];
-            $estatusUsuario = $fila['estatus'];
+        // 2. Verificar si el usuario está en la base de datos de login (intentos fallidos)
+        $sqlVerificarLogin = "SELECT intentos, tiempoBloqueado FROM login WHERE usuario = '$Usuario'";
+        $queryVeriLogin = $Conexion->query($sqlVerificarLogin);
+        $rowLogin = mysqli_fetch_assoc($queryVeriLogin);
 
-            if (password_verify($Contraseña, $contraseñaHash)) { // La contraseña es correcta
-                if ($estatusUsuario == 'Inactivo') { // Todavía no confirma su correo
-                    echo '<script language="javascript">alert("Falta la confirmación de correo para ingresar al sistema");</script>';
-                    $estatusInactivo = 1;
-                } else { // Estatus activo
-                    header('location:index.php?success="Bienvenido al merequetengue "');
-                    exit();
+        if ($rowLogin) {
+            // 3. El usuario está en la tabla 'login', verificar si está bloqueado
+            $intentosUsuario = $rowLogin['intentos'];
+            $tiempoBloqueado = $rowLogin['tiempoBloqueado'];
+
+            $tiempoActual = new DateTime();
+            $tiempoActualStr = $tiempoActual->format('H:i:s');
+
+            if ($tiempoBloqueado !== '00:00:00.00000' && $tiempoActualStr > $tiempoBloqueado) {
+                // 4. Desbloquear usuario si el tiempo de bloqueo ha pasado
+                $sqlDesbloquearUsuario = "DELETE FROM login WHERE usuario = '$Usuario'";
+                $Conexion->query($sqlDesbloquearUsuario);
+                verificarCredenciales($Usuario, $Contraseña); // Volver a verificar las credenciales
+            } elseif ($tiempoBloqueado == '00:00:00.00000') {
+                // 5. Verificar si la contraseña es correcta
+                if (password_verify($Contraseña, $contraseñaHash)) {
+                    // Contraseña correcta, verificar estatus del usuario
+                    if ($estatusUsuario == 'Inactivo') {
+                        echo '<script language="javascript">alert("Falta la confirmación de correo para ingresar al sistema");</script>';
+                        $estatusInactivo = 1;
+                    } else {
+                        // Usuario activo, redirigir según el tipo de usuario
+                        if($tipoUsuario == "Ayudante de boda") {
+                            header('location:infoAyudante.php?success="Bienvenido"');
+                            exit();
+                        } elseif ($tipoUsuario == "Proveedor") {
+                            header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor&id='. $id .'"');
+                            exit();
+                        } else {
+                            header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
+                            exit();
+                        }
+                    }
+                } else {
+                    // Contraseña incorrecta, incrementar intentos
+                    $intentosUsuario++;
+                    if ($intentosUsuario <= 3) {
+                        $sqlActualizarIntentos = "UPDATE login SET intentos = '$intentosUsuario' WHERE usuario = '$Usuario'";
+                        $Conexion->query($sqlActualizarIntentos);
+                        if ($intentosUsuario == 3) {
+                            // Bloquear usuario por 5 minutos
+                            $tiempoBloqueo = new DateTime();
+                            $tiempoBloqueo->modify('+5 minutes');
+                            $tiempoBloqueoStr = $tiempoBloqueo->format('H:i:s');
+                            $sqlBloquearUsuario = "UPDATE login SET tiempoBloqueado = '$tiempoBloqueoStr' WHERE usuario = '$Usuario'";
+                            $Conexion->query($sqlBloquearUsuario);
+                            echo '<script language="javascript">alert("Usuario bloqueado por 5 minutos.");</script>';
+                        } else {
+                            echo '<script language="javascript">alert("Contraseña incorrecta, intentos restantes: '.(3 - $intentosUsuario).'");</script>';
+                        }
+                    }
                 }
             } else {
-                // Verificar si el usuario tiene intentos
-                $sqlVerificarIntentos = "SELECT intentos, tiempoBloqueado FROM login WHERE usuario = '$Usuario'";
-                $queryVerifIntentos = $Conexion->query($sqlVerificarIntentos);
-                $row = mysqli_fetch_row($queryVerifIntentos);
-
-                if (mysqli_num_rows($queryVerifIntentos) > 0) { // Si está dentro de la base de datos
-                    $intentosUsuario = $row[0];
-                    $tiempoBloqueado = $row[1];
-
-                    $tiempoActual = new DateTime();
-                    $tiempoActual = $tiempoActual->format('H:i:s');
-
-                    if ($tiempoBloqueado !== '00:00:00.00000' && $tiempoActual > $tiempoBloqueado) {
-                        // El tiempo actual es mayor al tiempo bloqueado
-                        echo "Estas desbloqueado";
-                        $sqlUsuarioDesbloqueado = "DELETE FROM login WHERE usuario = '$Usuario';";
-                        $queryUsuarioDesbloqueado = $Conexion->query($sqlUsuarioDesbloqueado);
-
-                        // Volver a verificar credenciales
-                        verificarCredenciales($Usuario, $Contraseña);
-
-                    } elseif ($tiempoBloqueado == '00:00:00.00000') {
-                        // No hay tiempo bloqueado, así que puedes proceder
-                        // No se ha bloqueado, sigue con los intentos
-                        $intentosUsuario++;
-
-                        if ($intentosUsuario <= 3) { // Todavía tiene intentos
-                            $sqlSegundoIntento = "UPDATE login SET intentos = '$intentosUsuario' WHERE usuario = '$Usuario';";
-                            $querySegundoIntento = $Conexion->query($sqlSegundoIntento);
-
-                            if ($intentosUsuario == 2) {
-                                echo '<script language="javascript">alert("La contraseña es incorrecta, por favor de volver a ingresarla. Tiene solo 1 intento más");</script>';
-
-                            } else if ($intentosUsuario == 3) {
-                                $ultimoIntento = new DateTime(); // Hora del bloqueo de usuario más 5 minutos
-                                $ultimoIntento->modify('+5 minutes'); // Hora cuando se debe de liberar el bloqueo del usuario
-                                $ultimoIntento = $ultimoIntento->format('H:i:s');
-
-                                $sqlUsuarioBloqueado = "UPDATE login SET tiempoBloqueado = '$ultimoIntento' WHERE usuario = '$Usuario';";
-                                $queryUsuarioBloqueado = $Conexion->query($sqlUsuarioBloqueado);
-                                echo '<script language="javascript">alert("La contraseña es incorrecta, su usuario ha sido bloqueado por 5 minutos.");</script>';
-                            }
-                        }
-                    } else {
-                        echo '<script language="javascript">alert("Su usuario está bloqueado por 5 minutos.");</script>';
-                    }
-                } else { // No ha sido ingresada
-                    $sqlPrimerIntento = "INSERT INTO login (usuario, intentos, tiempoBloqueado) VALUES ('$Usuario', '1', '00:00:00.00000');";
-                    $queryPrimerIntento = $Conexion->query($sqlPrimerIntento);
-
-                    if ($queryPrimerIntento) { // Se le ingresa a la BD y se le notifica su primer intento fallido
-                        echo '<script language="javascript">alert("La contraseña es incorrecta, por favor de volver a ingresarla. Tiene solo 2 intentos más");</script>';
-                    }
-                }
+                // Usuario está bloqueado
+                echo '<script language="javascript">alert("Su usuario está bloqueado por 5 minutos.");</script>';
             }
         } else {
-            echo '<script language="javascript">alert("El usuario ingresado no existe");</script>';
+            // 3. El usuario no está en la tabla 'login', registrar primer intento fallido
+            if (password_verify($Contraseña, $contraseñaHash)) {
+                // Contraseña correcta, verificar estatus del usuario
+                if ($estatusUsuario == 'Inactivo') {
+                    echo '<script language="javascript">alert("Falta la confirmación de correo para ingresar al sistema");</script>';
+                    $estatusInactivo = 1;
+                } else {
+                    // Usuario activo, redirigir según el tipo de usuario
+                    if($tipoUsuario == "Ayudante de boda") {
+                        header('location:infoAyudante.php?success="Bienvenido"');
+                        exit();
+                    } elseif ($tipoUsuario == "Proveedor") {
+                        header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor&id='. $id .'"');
+                        exit();
+                    } else {
+                        header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
+                        exit();
+                    }
+                }
+            } else {
+                // Contraseña incorrecta, registrar en 'login' con 1 intento
+                $sqlRegistrarIntento = "INSERT INTO login (usuario, intentos, tiempoBloqueado) VALUES ('$Usuario', '1', '00:00:00.00000')";
+                $Conexion->query($sqlRegistrarIntento);
+                echo '<script language="javascript">alert("Contraseña incorrecta, tiene 2 intentos más.");</script>';
+            }
         }
+    } else {
+        // El usuario no existe
+        echo '<script language="javascript">alert("El usuario ingresado no existe");</script>';
     }
 }
 
@@ -98,7 +119,9 @@ if (isset($_POST['Usuario']) && isset($_POST['Contraseña'])) {
     $Contraseña = $_POST['Contraseña'];
     verificarCredenciales($Usuario, $Contraseña); 
 }
+
 ?>
+
 
 
 
@@ -132,7 +155,7 @@ if (isset($_POST['Usuario']) && isset($_POST['Contraseña'])) {
     <?php
     if ($estatusInactivo == 1) {
       ?>
-      <form action="confirmarCorreo.php" method="post">
+      <form action="confirmarCorreo.php?id=<?php echo $id; ?>" method="post">
         <label>Para activar tu correo</label><br>
         <button class="btn btn-light" type="submit">Da clik aqui</button>
       </form>

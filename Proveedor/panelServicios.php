@@ -43,20 +43,34 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
     <a class="btn btn-info btn-agregar" type="submit" href="agregarServicio.php?id=<?php echo $id; ?>">Agregar</a>
 </div>
 
+<!-- Card -->
 <?php
-$sqlServicios = "SELECT nombreServicio, imagen1 FROM servicios WHERE proveedor = $id";
+$sqlServicios = "SELECT * FROM servicios WHERE proveedor = $id";
 $queryServicios = $Conexion->query($sqlServicios);
 
 if ($queryServicios->num_rows > 0) {
     echo "<div class='card-container'>";
     while ($row = $queryServicios->fetch_assoc()) {
+        $idServicio = $row['id'];
         $nombreServicio = $row['nombreServicio'];
-        $imagen1 = 'data:image/jpeg;base64,' . base64_encode($row['imagen1']);
+        $descripcionServicio = $row['descripcion'];
+        $precio =  "$" . $row['precio'];
+        $calificacion = $row['calificacion'];
+
+        // Preparar imágenes
+        $imagenes = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $campoImagen = 'imagen' . $i;
+            if (!empty($row[$campoImagen])) {
+                $imagenes[] = 'data:image/jpeg;base64,' . base64_encode($row[$campoImagen]);
+            }
+        }
+
         echo "
         <div class='card' style='width: 12rem;' data-bs-toggle='modal' data-bs-target='#serviceModal' 
-            data-img='$imagen1' data-name='$nombreServicio'>
+            data-id='$idServicio' data-cali='$calificacion' data-images='" . json_encode($imagenes) . "' data-name='$nombreServicio' data-descrip='$descripcionServicio' data-precio='$precio'>
             <div class='card-img-container'>
-                <img src='$imagen1' class='card-img-top' alt='$nombreServicio'>
+                <img src='{$imagenes[0]}' class='card-img-top' alt='$nombreServicio'>
             </div>
             <div class='card-body'>
                 <h5 class='card-title'>$nombreServicio</h5>
@@ -65,7 +79,7 @@ if ($queryServicios->num_rows > 0) {
     }
     echo "</div>";
 } else {
-    echo "Todavia no tienes servicios dados de alta.";
+    echo "Todavía no tienes servicios dados de alta.";
 }
 ?>
 <br><br>
@@ -75,15 +89,50 @@ if ($queryServicios->num_rows > 0) {
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Información del Servicio</h5>
+                <h5 class="modal-title" id="modalName"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <img id="modalImage" src="" class="img-fluid" alt="Imagen del Servicio">
-                <p id="modalName"></p>
+                <div class="container ">
+                    <div class="row justify-content-start">
+                        <div class="col-4">
+
+                            <div class="carrusel-img-container">
+                                <div id="carouselExample" class="carousel slide">
+                                    <div class= "carrusel-img">
+                                        <div class="carousel-inner" id="carouselImages">
+                                            <!-- Imagenes javas -->
+                                        </div>
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Anterior</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Siguiente</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-4">
+                            <b><p>Descripcion</p></b>
+                            <p id="modalDescrip"></p>
+                            <b><p>Precio</p></b>
+                            <p id="modalPrecio"></p>
+                        </div>
+                    </div>
+                    <center>
+                    <label>Calificación:</label>
+                    <div class="star-container" id="starContainer">
+                        <!-- Calificacioncita -->
+                    </div>
+                    </center>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a class="btn btn-secondary" id="editarBtn" href="#" role="button">Editar</a>
             </div>
         </div>
     </div>
@@ -94,14 +143,53 @@ if ($queryServicios->num_rows > 0) {
         var modal = document.getElementById('serviceModal');
         modal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
-            var imgSrc = button.getAttribute('data-img');
+            var id = button.getAttribute('data-id');
+            var images = JSON.parse(button.getAttribute('data-images'));
             var name = button.getAttribute('data-name');
+            var descrip = button.getAttribute('data-descrip');
+            var precio = button.getAttribute('data-precio');
+            var calificacion = button.getAttribute('data-cali');
 
-            var modalImage = modal.querySelector('#modalImage');
+            var carouselImages = modal.querySelector('#carouselImages');            
             var modalName = modal.querySelector('#modalName');
+            var modalDescrip = modal.querySelector('#modalDescrip');
+            var modalPrecio = modal.querySelector('#modalPrecio');
+            var editarBtn = modal.querySelector('#editarBtn');
+            var starContainer = modal.querySelector('#starContainer');
 
-            modalImage.src = imgSrc;
+
+            // Limpiar el contenido anterior
+            carouselImages.innerHTML = '';
+            starContainer.innerHTML = '';
+
+            // Crear elementos de carrusel para cada imagen
+            images.forEach(function(image, index) {
+                var carouselItem = document.createElement('div');
+                carouselItem.classList.add('carousel-item');
+                if (index === 0) {
+                    carouselItem.classList.add('active');
+                }
+                var imgElement = document.createElement('img');
+                imgElement.src = image;
+                imgElement.classList.add('float-start', 'w-100', 'd-block');
+                imgElement.alt = 'Imagen del Servicio';
+                carouselItem.appendChild(imgElement);
+                carouselImages.appendChild(carouselItem);
+            });
+
+            //Crear elementos de la calificacion
+            for (var i = 1; i <= 5; i++) {
+                var starImg = document.createElement('img');
+                starImg.src = i <= calificacion ? '../Imagenes/estrella_completa.png' : '../Imagenes/estrella_vacia.png';
+                starImg.alt = 'Estrella';
+                starContainer.appendChild(starImg);
+            }
+            
             modalName.textContent = name;
+            modalDescrip.textContent = descrip;
+            modalPrecio.textContent = precio;
+
+            editarBtn.href = 'editarServicio.php?id=' + id;
         });
     });
 </script>
