@@ -49,3 +49,93 @@ nav {
     text-decoration: none;
     color: black;
 }
+/*Codigo de evento*/
+.btn-morado {
+    background-color: #a710a7;
+    border-color: #a710a7;
+    color: white; 
+    padding: 5px 50px; 
+    border-radius: 5px;
+    cursor: pointer;
+    bottom: 5px;
+    right: 20px; 
+}
+
+.btn-morado:hover {
+    background-color: #660066; 
+    border-color: #660066;
+    color: white; 
+}
+
+.btn-rosa {
+    background-color: #e472a9;
+    border-color: #e472a9;
+    color: white; 
+    padding: 5px 30px; 
+    border-radius: 5px;
+    cursor: pointer;
+    bottom: 5px;
+    right: 20px; 
+}
+
+.btn-rosa:hover {
+    background-color: #ae4678; 
+    border-color: #ae4678;
+    color: white; 
+}
+input, select {
+    width: 60%;
+}
+select{
+    padding: 5px;
+}
+
+/*Seleccion de elementos*/
+/* Dividir la pantalla en dos secciones horizontales */
+.containerSE {
+    display: flex;
+    flex-direction: column;
+    height: 150vh;
+}
+
+.top-section, .bottom-section {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #fff;
+}
+.top-section {
+    background: linear-gradient(white, #FFFBFC);
+}
+.bottom-section {
+    background: linear-gradient(#FFFBFC, pink);
+}
+/* Estilos para los checkboxes */
+.checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Sección superior */
+#top-section .d-flex {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; 
+}
+
+#top-section .d-flex span {
+    width: 400px; 
+    margin-right: 50px;
+}
+
+#top-section .d-flex input[type="text"],
+#top-section .d-flex select {
+    margin-right: 20px;
+}
+
+#top-section .d-flex img {
+    width: 20px; 
+    height: 20px; 
+    cursor: pointer;
+}

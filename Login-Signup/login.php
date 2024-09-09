@@ -91,13 +91,13 @@ function verificarCredenciales($Usuario, $Contraseña) {
                 } else {
                     // Usuario activo, redirigir según el tipo de usuario
                     if($tipoUsuario == "Ayudante de boda") {
-                        header('location:infoAyudante.php?success="Bienvenido"');
+                        header('location:infoAyudante.php?success="Bienvenido&id='. $id .'""');
                         exit();
                     } elseif ($tipoUsuario == "Proveedor") {
                         header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor&id='. $id .'"');
                         exit();
                     } else {
-                        header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
+                        header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio&id='. $id .'""');
                         exit();
                     }
                 }
