@@ -139,3 +139,29 @@ select{
     height: 20px; 
     cursor: pointer;
 }
+.tooltip-container {
+    position: relative; 
+    display: inline-block;
+  }
+  
+  .tooltip-text {
+    visibility: hidden;
+    width: 170px;
+    background-color: #fab1cb;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 110%; /* Cambia el valor según sea necesario */
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+  
