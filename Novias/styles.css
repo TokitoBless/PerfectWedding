@@ -83,6 +83,24 @@ nav {
     border-color: #ae4678;
     color: white; 
 }
+
+.btn-lila {
+    background-color: #f1948a  ;
+    border-color: #f1948a  ;
+    color: white; 
+    padding: 5px 50px; 
+    border-radius: 5px;
+    cursor: pointer;
+    bottom: 5px;
+    right: 20px; 
+}
+
+.btn-lila:hover {
+    background-color: #ec7063; 
+    border-color: #ec7063;
+    color: white; 
+}
+
 input, select {
     width: 60%;
 }
@@ -165,3 +183,9 @@ select{
     opacity: 1;
   }
   
+
+  /*Texto libre*/
+  textarea {
+    padding: 10px;
+    resize: both;
+}
