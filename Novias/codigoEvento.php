@@ -1,6 +1,42 @@
 <?php
+include_once('../Conexion/conexion.php');
+
 // Obtiene el ID del header desde la URL
 $id = isset($_GET['id']) ? $_GET['id'] : '';
+
+if(isset($_POST['usuarioBoda'])){
+  $usuarioIngresado = $_POST['usuarioBoda'];//usuario ingresado
+
+  $sqlVerificarUsuario = "SELECT * FROM usuarios WHERE usuario = '$usuarioIngresado'";
+  $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
+
+  if (mysqli_num_rows($queryVeriUsuario) > 0) {
+    // El usuario existe en la tabla usaurios
+    $fila = $queryVeriUsuario->fetch_assoc();
+    $idUsuario = $fila['id'];//sacar el id del usuario que ingreso
+
+    $sqlVerificarBoda = "SELECT * FROM bodas WHERE usuario = '$idUsuario'";
+    $queryVeriBoda = $Conexion->query($sqlVerificarBoda);
+
+    if (mysqli_num_rows($queryVeriBoda) > 0) {
+      //El usuario esta en la tabla da bodas
+      $filaBoda = $queryVeriBoda->fetch_assoc();
+      $idBoda = $filaBoda['idEvento'];//sacar el id de la boda
+
+      echo '<script language="javascript">alert("Suerte ayudando!!!");window.location.href = "panelTarea.php&idUsuario=' . $id . '&idBoda=' . $idBoda . '";</script>';
+    }else {
+      // No hay ninguna boda con ese usuario como encargado
+      echo '<script language="javascript">alert("No hay ninguna boda con ese usuario como encargado");</script>';
+    }
+
+
+  }else {
+    // El usuario no existe
+    echo '<script language="javascript">alert("El usuario ingresado no existe");</script>';
+  }
+
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -34,7 +70,7 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
         <h6 class="card-subtitle mb-2 text-body-secondary">Para ser parte de esta boda, ingresa el usuario de la persona que creo el evento</h6>
         <br><br>
         <form action="codigoEvento.php?id=<?php echo $id; ?>" method="POST">
-            <input type="text">
+            <input type="text" name="usuarioBoda">
             <br><br><br>
             <button class="btn btn-rosa"  type="submit">Ayudar en esta boda</button>
             <br><br>

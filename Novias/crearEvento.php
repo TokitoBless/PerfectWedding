@@ -1,5 +1,6 @@
 <?php
 include_once('../Conexion/conexion.php');
+$eventoExistente = 0;
 
 // Obtiene el ID del header desde la URL
 if (isset($_GET['id'])) {
@@ -9,37 +10,64 @@ if (isset($_GET['id'])) {
     header('Location: crearEvento.php?error="No se proporcionó ID del usuario"');
     exit();
 }
+
 if (isset($_POST['fechaBoda']) && isset($_POST['estado']) && isset($_POST['presupuestoTotal'])){
-    $fechaBoda = $_POST['fechaBoda'];
-    $estado = $_POST['estado'];
-    $presupuesto = $_POST['presupuestoTotal'];
-    
-    $sqlRevisarFecha = "SELECT fechaRegistro FROM usuarios WHERE id = '$id'";
-    $queryRevisarFecha = $Conexion->query($sqlRevisarFecha);
-    $row = mysqli_fetch_row($queryRevisarFecha);
-    $fechaRegistro = $row[0];
-    $fechaLimite = new DateTime($fechaRegistro);
-    $fechaLimite = $fechaLimite->modify('+1 month');
-    $fechaLimite = $fechaLimite->format('Y-m-d'); 
+    //checar si tiene otro evento creado
 
-    if($fechaBoda > $fechaLimite){
-        //la fecha ingresada el mayor de un mes
-        $sqlIngresarBoda = "INSERT INTO bodas(usuario, fechaBoda, estado, presupuestoTotal) VALUE ('$id', '$fechaBoda', '$estado', '$presupuesto')";
-        $queryIngresarBoda = $Conexion->query($sqlIngresarBoda);
-        if($queryIngresarBoda){
-            $sqlIdBoda = "SELECT MAX(idEvento) FROM bodas WHERE usuario = '$id'";
-            $queryIdBoda = $Conexion->query($sqlIdBoda);
-            $row = mysqli_fetch_row($queryIdBoda);
-            $idBoda = $row[0];
-            header('location:seleccionElementos.php?success=Evento creado&idUsuario=' . $id . '&idBoda='.$idBoda.'');
-            exit();
-        }
+    $sqlVerificarBoda = "SELECT * FROM bodas WHERE usuario = '$id'";
+    $queryVeriBoda = $Conexion->query($sqlVerificarBoda);
+
+    if (mysqli_num_rows($queryVeriBoda) > 0) {
+        //ya tiene un evento
+        $eventoExistente = 1;
     }else{
-        echo '<script language="javascript">alert("La fecha de la boda debe de ser de un mes despues de su registro.\r\nPuede ser despues de la fecha '.$fechaLimite.'");</script>';
-    }
 
+        //Es su primer evento
+        $fechaBoda = $_POST['fechaBoda'];
+        $estado = $_POST['estado'];
+        $presupuesto = $_POST['presupuestoTotal'];
+        
+        $sqlRevisarFecha = "SELECT fechaRegistro FROM usuarios WHERE id = '$id'";
+        $queryRevisarFecha = $Conexion->query($sqlRevisarFecha);
+        $row = mysqli_fetch_row($queryRevisarFecha);
+        $fechaRegistro = $row[0];
+        $fechaLimite = new DateTime($fechaRegistro);
+        $fechaLimite = $fechaLimite->modify('+1 month');
+        $fechaLimite = $fechaLimite->format('Y-m-d'); 
+
+        if($fechaBoda > $fechaLimite){
+            //la fecha ingresada el mayor de un mes
+            $sqlIngresarBoda = "INSERT INTO bodas(usuario, fechaBoda, estado, presupuestoTotal) VALUE ('$id', '$fechaBoda', '$estado', '$presupuesto')";
+            $queryIngresarBoda = $Conexion->query($sqlIngresarBoda);
+            if($queryIngresarBoda){
+                $sqlIdBoda = "SELECT MAX(idEvento) FROM bodas WHERE usuario = '$id'";
+                $queryIdBoda = $Conexion->query($sqlIdBoda);
+                $row = mysqli_fetch_row($queryIdBoda);
+                $idBoda = $row[0];
+                header('location:seleccionElementos.php?success=Evento creado&idUsuario=' . $id . '&idBoda='.$idBoda.'');
+                exit();
+            }
+        }else{
+            echo '<script language="javascript">alert("La fecha de la boda debe de ser de un mes despues de su registro.\r\nPuede ser despues de la fecha '.$fechaLimite.'");</script>';
+        }
+
+    }
 }
 
+// Verificar si se ha solicitado la eliminación
+if (isset($_POST['accion']) && $_POST['accion'] === 'eliminar') {
+    $eventoExistente = 0;
+    // Eliminar el evento de la tabla bodas
+    $sqlEliminarBoda = "DELETE FROM bodas WHERE usuario = '$id'";
+    $sqlEliminarElementosBoda = "DELETE FROM elementosBoda WHERE usuario = '$id'";
+
+    if ($Conexion->query($sqlEliminarBoda) === TRUE) {
+        if ($Conexion->query($sqlEliminarElementosBoda) === TRUE) {
+            echo 'Se ha eliminado correctamente';
+            exit;
+        }
+    }
+}
 
 ?>
 
@@ -55,39 +83,13 @@ if (isset($_POST['fechaBoda']) && isset($_POST['estado']) && isset($_POST['presu
 </head>
 <body>
 
-<nav class="navbar navbar-complex navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <div class="title_nav">
-            <img src="../Imagenes/Wedding planner.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
-            <span>Perfect Wedding</span>
-        </div>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $id; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="conversaciones.php?id=<?php echo $id; ?>">Tabla kanban</a>
-                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            Tableros
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="#">Tableros favoritos</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                        </li>
-                    </ul>
-                </div>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $id; ?>">
-                    <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
-                </a>
-            </div>
-        </div>
-    </div>
+<nav class="navbar bg-body-tertiary">
+  <div class="container-fluid">
+    <p class="title_nav">
+      <img src="../Imagenes/Wedding planner.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
+      Perfect Wedding
+    </p>
+  </div>
 </nav>
 <br>
 
@@ -152,6 +154,38 @@ if (isset($_POST['fechaBoda']) && isset($_POST['estado']) && isset($_POST['presu
 <button class="btn btn-morado" type="submit">Crear</button>
 
 </form>
+<br><br>
+<?php
+if ($eventoExistente == 1) {
+?>
+    <label>Ya tienes un evento creado ¿Quieres eliminarlo y crear otro?</label>
+    <button type="button" class="btn btn-rosa" onclick="confirmarEliminacion()">Eliminar evento</button>
+
+    <script>
+    function confirmarEliminacion() {
+        // Mostrar confirmación antes de eliminar el evento
+        if (confirm("¿Estás seguro de que deseas eliminar el evento?\r\nDespues de eliminarlo ya no podra recuperar los datos")) {
+            // Crear un objeto FormData para enviar la petición AJAX
+            const formData = new FormData();
+            formData.append('accion', 'eliminar');
+            
+            // Hacer la petición AJAX para eliminar el evento
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '', true); // Mandar la solicitud al mismo archivo PHP
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Mostrar el resultado de la operación
+                    alert(xhr.responseText);
+                }
+            };
+            xhr.send(formData); // Enviar el formulario con la acción "eliminar"
+        }
+    }
+    </script>
+<?php
+}
+?>
+
 </center>
 
 </body>

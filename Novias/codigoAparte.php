@@ -187,8 +187,8 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
         </div>
     </div>
 </div>
-<input type="hidden" id="idUsuario" value="<?php echo $id; ?>"> 
-<input type="hidden" id="idBoda" value="<?php echo $idBoda; ?>">
+<input type="hidden" id="idUsuario" value="<?php echo $id; ?>"> <!-- Ejemplo de campo oculto para idUsuario -->
+<input type="hidden" id="idBoda" value="<?php echo $idBoda; ?>"> <!-- Ejemplo de campo oculto para idBoda -->
 
 <script>
 // Inicializa el DOMContentLoaded
@@ -197,8 +197,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const sumaPresupuestosSpan = document.getElementById('sumaPresupuestos');
     const guardarBtn = document.getElementById('guardarBtn');
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    const idUsuario = document.getElementById('idUsuario').value; 
-    const idBoda = document.getElementById('idBoda').value; 
+    const idUsuario = document.getElementById('idUsuario').value; // Obtener idUsuario
+    const idBoda = document.getElementById('idBoda').value; // Obtener idBoda
     let elementos = [];
 
     // Actualiza la suma de presupuestos y verifica condiciones
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Agregar el elemento a la categoría correcta en la sección superior
-    function agregarElemento(checkbox, label, categoria, value) {
+    function agregarElemento(checkbox, label, categoria) {
         const seccionCategoria = document.getElementById(`seleccionados-${categoria}`);
         const newItem = document.createElement('div');
         newItem.classList.add('d-flex', 'align-items-center', 'mb-2');
@@ -316,7 +316,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar el elemento a la lista
         elementos.push({
             nombre: label,
-            values: value,
             presupuesto: inputPresupuesto.value,
             inputPresupuesto: inputPresupuesto,
             selectPrioridad: selectPrioridad
@@ -344,8 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (checkbox.checked) {
                 const label = checkbox.nextElementSibling.textContent;
                 const categoria = checkbox.getAttribute('data-categoria');
-                const value = checkbox.value; 
-                agregarElemento(checkbox, label, categoria, value);
+                agregarElemento(checkbox, label, categoria);
             }
         });
     });
@@ -357,13 +355,11 @@ document.addEventListener('DOMContentLoaded', function() {
         elementos.forEach(el => {
             const presupuesto = el.inputPresupuesto.value;
             const prioridad = el.selectPrioridad.value;
-            const checkbox = 
             elementosData.push({
-                nombre: el.values,
+                nombre: el.nombre,
                 presupuesto: presupuesto,
                 prioridad: prioridad
             });
-            
         });
 
         const dataToSend = {
