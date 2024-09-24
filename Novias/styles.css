@@ -49,7 +49,7 @@ nav {
     text-decoration: none;
     color: black;
 }
-/*Codigo de evento*/
+/*Botones*/
 .btn-morado {
     background-color: #a710a7;
     border-color: #a710a7;
@@ -100,6 +100,21 @@ nav {
     border-color: #ec7063;
     color: white; 
 }
+
+.btn-ch-marilla{
+    background-color: #f4c979  ;
+    border-color: #f4c979  ;
+    color: white; 
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-ch-marilla:hover {
+    background-color: #d9a442; 
+    border-color: #d9a442;
+    color: white; 
+}
+
 
 input, select {
     width: 60%;
@@ -161,31 +176,73 @@ select{
     position: relative; 
     display: inline-block;
   }
-  
-  .tooltip-text {
-    visibility: hidden;
-    width: 170px;
-    background-color: #fab1cb;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    left: 110%; /* Cambia el valor según sea necesario */
-    transform: translateY(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-  }
-  
 
-  /*Texto libre*/
-  textarea {
-    padding: 10px;
-    resize: both;
+.tooltip-text {
+visibility: hidden;
+width: 170px;
+background-color: #fab1cb;
+color: #fff;
+text-align: center;
+border-radius: 6px;
+padding: 5px;
+position: absolute;
+z-index: 1;
+top: 50%;
+left: 110%; /* Cambia el valor según sea necesario */
+transform: translateY(-50%);
+opacity: 0;
+transition: opacity 0.3s;
+}
+.tooltip-container:hover .tooltip-text {
+visibility: visible;
+opacity: 1;
+}
+
+
+/*Texto libre*/
+textarea {
+padding: 10px;
+resize: both;
+}
+
+/*Lista de invitados*/
+
+.form-inline {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap; /* Evita que los elementos se muevan a una nueva línea */
+    gap: 10px; /* Espacio entre los elementos */
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.form-inline label {
+    white-space: nowrap; /* Evita que el texto de la etiqueta se divida */
+}
+
+.form-inline input, 
+.form-inline select, 
+.form-inline button {
+    flex: 0 1 auto; /* Permite que los elementos se ajusten correctamente sin saltar de línea */
+    margin: 0;
+}
+
+.select-container {
+    width: 600px;
+}
+.input-container {
+    width: 600px;
+}
+
+.form-select {
+    width: 100%; 
+    height: 40px;
+    box-sizing: border-box; 
+}
+
+.form-input {
+    min-width: 200px;
+    width: 100%; 
+    max-width: 300px; 
+    box-sizing: border-box; 
 }

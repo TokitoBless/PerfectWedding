@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo "<div class='mb-3 hidden'>";
             echo "<label for='{$label}' class='form-label'>{$label}</label>";
-            echo "<select class='form-select' id='{$label}' name='{$label}'>";
+            echo "<select class='form-select'  id='{$label}' name='{$label}'>";
             echo "<option value=''>Selecciona una opción</option>";
             foreach ($options as $option) {
                 echo "<option value='{$option}'>{$option}</option>";

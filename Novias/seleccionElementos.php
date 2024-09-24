@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
         inputPresupuesto.type = 'text';
         inputPresupuesto.placeholder = '$';
         inputPresupuesto.classList.add('me-3', 'form-control');
-        inputPresupuesto.pattern = '[1-9][0-9]*'; // Asegúrate de que el patrón sea correcto
+        inputPresupuesto.pattern = '[1-9][0-9]*'; 
         inputPresupuesto.required = true;
 
         const selectPrioridad = document.createElement('select');

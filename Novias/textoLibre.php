@@ -6,7 +6,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     $idBoda = $_GET['idBoda'];
     
 } else {
-    header('Location: descripcionElementos.php?error="No se proporcionó ID de usuario ni de boda"');
+    header('Location: textoLibre.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
 }
 ?>
@@ -37,6 +37,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $id; ?>">Calendario</a>
                 <a class="nav-item nav-link" href="conversaciones.php?id=<?php echo $id; ?>">Tabla kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -59,19 +60,22 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     </div>
 </nav>
 <br><h3>Describe tu boda</h3>
-<div style="text-align: right; margin-top: 20px; padding-right: 10px;">
-    <button type="submit" class="btn btn-lila">Guardar</button>
-    <a type="button" class="btn btn-rosa" href="descripcionElementos.php?idUsuario=<?php echo $id;?>&idBoda=<?php echo $idBoda; ?>">Formulario</a>
-</div>
-<br>
-<div style="padding: 30px">
+<form action="textoLibre.php?idUsuario=<?php echo $id;?>&idBoda=<?php echo $idBoda; ?>" method="post">
 
-    <div class="form-floating">
-    <textarea class="form-control" name="descripcion" placeholder="Describe tu boda" id="floatingTextarea2" style="height: 290px"></textarea>
-    <label for="floatingTextarea2">Como te imaginas tu boda</label>
+    <div style="text-align: right; margin-top: 20px; padding-right: 10px;">
+        <button type="submit" class="btn btn-lila">Guardar</button>
+        <a type="button" class="btn btn-rosa" href="descripcionElementos.php?idUsuario=<?php echo $id;?>&idBoda=<?php echo $idBoda; ?>">Formulario</a>
     </div>
+    <br>
+    <div style="padding: 30px">
 
-</div>
+        <div class="form-floating">
+        <textarea class="form-control" name="descripcion" placeholder="Describe tu boda" id="floatingTextarea2" style="height: 290px" required></textarea>
+        <label for="floatingTextarea2">Como te imaginas tu boda</label>
+        </div>
 
+    </div>
+    
+</form>
 </body>
 </html>

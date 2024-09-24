@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 include_once('../Conexion/conexion.php');
 $eventoExistente = 0;
 
@@ -68,6 +70,45 @@ if (isset($_POST['accion']) && $_POST['accion'] === 'eliminar') {
         }
     }
 }
+// Verificar si se ha solicitado editar el evento existente
+if (isset($_POST['accion']) && $_POST['accion'] === 'editar') {
+    // Checar si hay un evento y obtener el ID del evento
+    $sqlVerificarBoda = "SELECT idEvento FROM bodas WHERE usuario = '$id'";
+    $queryVeriBoda = $Conexion->query($sqlVerificarBoda);
+
+    $row = mysqli_fetch_row($queryVeriBoda);
+    $idBoda = $row[0];
+
+    // Checar si hay elementos seleccionados en la boda
+    $sqlVerificarElementos = "SELECT * FROM elementosboda WHERE evento = '$idBoda'";
+    $queryVerificarElementos = $Conexion->query($sqlVerificarElementos);
+
+    if (mysqli_num_rows($queryVerificarElementos) == 0) {
+        // No hay elementos seleccionados, redirigir a seleccionElementos
+        echo json_encode(['redirect' => 'seleccionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda]);
+        exit();
+
+    } else {
+        // Hay elementos, ahora checar si tienen descripción
+        $sqlVerificarDescripcion = "SELECT * FROM elementosboda WHERE evento = '$idBoda' AND (descripcion IS NULL OR descripcion = '')";
+        $queryVerificarDescripcion = $Conexion->query($sqlVerificarDescripcion);
+
+        if (mysqli_num_rows($queryVerificarDescripcion) > 0) {
+            // Hay elementos sin descripción, redirigir a descripcionElementos
+            echo json_encode(['redirect' => 'descripcionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda]);
+            exit();
+
+        } else {
+            // Todos los elementos tienen descripción, redirigir a tableroGeneral
+            echo json_encode(['redirect' => 'panelGeneral.php?idUsuario=' . $id . '&idBoda=' . $idBoda]);
+            exit();
+        }
+    }
+}
+
+
+
+
 
 ?>
 
@@ -160,8 +201,12 @@ if ($eventoExistente == 1) {
 ?>
     <label>Ya tienes un evento creado ¿Quieres eliminarlo y crear otro?</label>
     <button type="button" class="btn btn-rosa" onclick="confirmarEliminacion()">Eliminar evento</button>
+    <br><br>
+    <label>¿O quieres seguir con el mismo evento?</label>
+    <button type="button" class="btn btn-lila" onclick="editarEvento()" >Evento ya creado</button>
 
     <script>
+
     function confirmarEliminacion() {
         // Mostrar confirmación antes de eliminar el evento
         if (confirm("¿Estás seguro de que deseas eliminar el evento?\r\nDespues de eliminarlo ya no podra recuperar los datos")) {
@@ -181,6 +226,42 @@ if ($eventoExistente == 1) {
             xhr.send(formData); // Enviar el formulario con la acción "eliminar"
         }
     }
+
+    function editarEvento() {
+        const formData = new FormData();
+        formData.append('accion', 'editar');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '', true); // Enviar al mismo archivo PHP
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        // Intenta interpretar la respuesta como JSON
+                        const response = JSON.parse(xhr.responseText);
+
+                        // Si la respuesta contiene la instrucción de redirección
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        } else {
+                            // Manejar otras respuestas o mensajes
+                            alert(xhr.responseText);
+                        }
+                    } catch (e) {
+                        // Si la respuesta no es JSON o no puede ser interpretada
+                        console.error("Error interpretando la respuesta:", e);
+                        alert("Hubo un error al procesar la respuesta.");
+                    }
+                } else {
+                    console.error("Error en la solicitud AJAX:", xhr.status, xhr.statusText);
+                    alert("Hubo un error al procesar la solicitud.");
+                }
+            }
+        };
+        xhr.send(formData);
+    }
+
+
     </script>
 <?php
 }
