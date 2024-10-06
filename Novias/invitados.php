@@ -101,7 +101,7 @@ if (isset($_POST['updateStatus'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <title>Nuevo evento</title>
+    <title>Lista de invitados</title>
     
 </head>
 <body>
@@ -117,8 +117,8 @@ if (isset($_POST['updateStatus'])) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="conversaciones.php?id=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
@@ -127,8 +127,8 @@ if (isset($_POST['updateStatus'])) {
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="#">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
                             <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                         </li>

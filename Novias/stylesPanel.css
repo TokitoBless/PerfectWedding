@@ -1,0 +1,153 @@
+body {
+margin: 0;
+padding: 0;
+font-family: Arial, sans-serif;
+}
+/*Estilos para la navbar*/
+nav {
+background: linear-gradient(to right, #FFF7AD, #FFA9F9);
+width: 100%;
+height: 60px;
+display: flex;
+align-items: center;
+padding-left: 10px;
+}
+
+.container-fluid {
+display: flex;
+align-items: center;
+}
+
+.title_nav {
+display: flex;
+align-items: center;
+font-size: 20px;
+}
+
+.title_nav img {
+margin-right: 10px;  
+}
+
+/* Estilos específicos para navbar-simple */
+.navbar-simple .container-fluid {
+justify-content: flex-start; 
+}
+
+/* Estilos específicos para navbar-menu */
+.navbar-complex .container-fluid {
+justify-content: space-between; 
+}
+
+.navbar-complex .navbar-nav {
+display: flex;
+align-items: center;
+list-style-type: none;
+padding: 0;
+margin: 0;
+}
+
+.navbar-complex .nav-item {
+margin-right: 20px; 
+}
+
+.navbar-complex .nav-item a {
+text-decoration: none;
+color: black;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 10px;
+    padding-left: 30px;
+}
+
+.card {
+    flex-shrink: 0;
+    width: calc(16.66% - 10px); 
+    display: flex;
+    flex-direction: column;
+}
+.card-img-container {
+    width: 100%; 
+    height: 250px; 
+    display: flex;
+    align-items: center;
+}
+
+.card-img-top {
+    max-width: 100%;
+    max-height: 100%; 
+    object-fit: contain;
+}
+.carrusel-img-container {
+    width: 100%; 
+    height: 250px; 
+    display: flex;
+    align-items: left;
+}
+.carrusel-img{
+    max-width: 100%;
+    max-height: 100%; 
+    object-fit: contain;
+}
+
+/* En pantallas más pequeñas */
+@media (max-width: 768px) {
+    .card {
+        width: calc(33.33% - 10px); 
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        width: calc(50% - 10px); 
+    }
+}
+
+/*Modal*/
+.infoServicio{
+    width: 100px; 
+    height: 150px; 
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; 
+    padding: 10px;
+}
+
+.btn-lila {
+    background-color: #e472a9  ;
+    border-color: #e472a9  ;
+    color: white; 
+    padding: 5px 25px; 
+    border-radius: 5px;
+    cursor: pointer;
+    bottom: 5px;
+    right: 20px; 
+}
+
+.btn-lila:hover {
+    background-color: #ae4678; 
+    border-color: #ae4678;
+    color: white; 
+}
+
+.filtro-precio-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.filtro-precio-container label {
+    font-size: 14px;
+}
+
+.filtro-precio-container input[type="range"] {
+    flex-grow: 1;
+    margin: 0 10px;
+}
