@@ -85,6 +85,20 @@ if ($queryPrecios->num_rows > 0) {
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
                 <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tableros
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
@@ -113,11 +127,12 @@ if ($queryPrecios->num_rows > 0) {
             <label for="precioMin">$<span id="labelPrecioMin"><?php echo number_format($precioMin); ?></span></label>
             <label for="precioMax" class="float-end">$<span id="labelPrecioMax"><?php echo number_format($precioMax); ?></span></label>
         </div>
-        <input type="range" class="form-range" min="<?php echo $precioMin; ?>" max="<?php echo $precioMax; ?>" step="1000" id="filtroPrecio" oninput="actualizarRangoPrecio(this.value)">
+        <input type="range" class="form-range" min="<?php echo $precioMin; ?>" max="<?php echo $precioMax+$precioMin; ?>" step="1000" id="filtroPrecio">
         <p>Precio: $<span id="rangoPrecioActual"></span></p>
 
         <li>Filtrar por calificacion</li>
         <div class="calificacion-estrellas">
+            <img src="../Imagenes/circulo-vacio.png" class="estrella" data-calificacion="0" alt="0 estrellas" width="25" height="25">
             <img src="../Imagenes/estrella_vacia.png" class="estrella" data-calificacion="1" alt="1 estrella" width="30" height="30">
             <img src="../Imagenes/estrella_vacia.png" class="estrella" data-calificacion="2" alt="2 estrellas" width="30" height="30">
             <img src="../Imagenes/estrella_vacia.png" class="estrella" data-calificacion="3" alt="3 estrellas" width="30" height="30">
@@ -178,18 +193,27 @@ if ($queryPrecios->num_rows > 0) {
   </div>
 </div>
 <script>//Filtro de precios
-    document.addEventListener('DOMContentLoaded', function () {
-        var filtroPrecio = document.getElementById('filtroPrecio');
-        var rangoPrecioActual = document.getElementById('rangoPrecioActual');
-        
-        // Inicializar el valor actual con el valor mínimo
-        rangoPrecioActual.textContent = filtroPrecio.value;
+document.addEventListener('DOMContentLoaded', function () {
+    var filtroPrecio = document.getElementById('filtroPrecio');
+    var rangoPrecioActual = document.getElementById('rangoPrecioActual');
 
-        // Función que se ejecuta al cambiar el valor del rango
-        filtroPrecio.addEventListener('input', function() {
+    // Obtener el valor mínimo dinámico del rango (de PHP o de otra fuente)
+    var precioMin = parseInt(filtroPrecio.min);
+    var precioMax = parseInt(filtroPrecio.max);
+
+    // Inicializar el valor actual con el primer valor
+    rangoPrecioActual.textContent = precioMin;
+
+    // Función que se ejecuta al cambiar el valor del rango
+    filtroPrecio.addEventListener('input', function() {
+        if(filtroPrecio.value!=precioMin)
+            rangoPrecioActual.textContent = parseInt(filtroPrecio.value)-precioMin.toLocaleString();
+        else
             rangoPrecioActual.textContent = parseInt(filtroPrecio.value).toLocaleString();
-        });
+
     });
+
+});
 </script>
 
 <script>//Filtro de calificacion
@@ -296,8 +320,10 @@ if ($queryServicios->num_rows > 0) {
         $idServicio = $row['id'];
         $nombreServicio = $row['nombreServicio'];
         $descripcionServicio = $row['descripcion'];
-        $precio = "$" . $row['precio'];
+        $precio = $row['precio'];
         $calificacion = $row['calificacion'];
+        $categoria = $row['categoria'];
+        $palabraClave = $row['palabraClave'];
 
         // Preparar imágenes
         $imagenes = [];
@@ -310,7 +336,7 @@ if ($queryServicios->num_rows > 0) {
 
         echo "
         <div class='card' style='width: 12rem;' data-bs-toggle='modal' data-bs-target='#serviceModal' 
-            data-id='$idServicio' data-cali='$calificacion' data-images='" . json_encode($imagenes) . "' data-name='$nombreServicio' data-descrip='$descripcionServicio' data-precio='$precio'>
+            data-id='$idServicio' data-idUsuario='$idUsuario' data-idBoda='$idBoda' data-categoria='$categoria' data-palabraClave='$palabraClave' data-cali='$calificacion' data-images='" . json_encode($imagenes) . "' data-name='$nombreServicio' data-descrip='$descripcionServicio' data-precio='$precio'>
             <div class='card-img-container'>
                 <img src='{$imagenes[0]}' class='card-img-top' alt='$nombreServicio'>
             </div>
@@ -369,9 +395,13 @@ if ($queryServicios->num_rows > 0) {
                         </div>
                     </center>
                 </div>
+                <div>
+                    <label class="form-check-label">Favorito</label>
+                    <input class="form-check-input" type="checkbox" value="" id="checkFavorito">
+                </div>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-secondary" id="editarBtn" href="#" role="button">Editar</a>
+                <a class="btn btn-secondary" id="editarBtn" href="#" role="button">Presupuesto</a>
             </div>
         </div>
     </div>
@@ -383,11 +413,16 @@ if ($queryServicios->num_rows > 0) {
         modal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             var id = button.getAttribute('data-id');
+            var idBoda = button.getAttribute('data-idBoda');
+            var idUsuario = button.getAttribute('data-idUsuario');
             var images = JSON.parse(button.getAttribute('data-images'));
             var name = button.getAttribute('data-name');
             var descrip = button.getAttribute('data-descrip');
+            var categoria = button.getAttribute('data-categoria');
             var precio = button.getAttribute('data-precio');
             var calificacion = button.getAttribute('data-cali');
+            var palabraClave = button.getAttribute('data-palabraClave');
+            
 
             var carouselImages = modal.querySelector('#carouselImages');            
             var modalName = modal.querySelector('#modalName');
@@ -416,9 +451,66 @@ if ($queryServicios->num_rows > 0) {
             modalName.textContent = name;
             modalDescrip.textContent = descrip;
             modalPrecio.textContent = precio;
-            editarBtn.href = `modificarServicio.php?idServicio=${id}`;
+            editarBtn.href = `solicitarPresupuesto.php?idServicio=${id}`;
+            
+            // Enviar datos al servidor
+            const data = {
+                idServicio: id,
+                idUsuario: idUsuario,
+                idBoda: idBoda,
+                categoria: categoria,
+                precio: precio,
+                checkFavorito: '0',
+                palabraClave: palabraClave
+            };
+
+            fetch('guardarClicks.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text()) // Recibir respuesta del servidor
+            .then(data => {
+                alert(data); // Mostrar la respuesta del servidor
+            })
+            .catch(error => {
+               console.error('Error:', error);
+            });
+
+            // Escuchar cambios en los checkboxes
+            document.getElementById('checkFavorito').addEventListener('change', function() {
+                if (this.checked) {
+                    const data = {
+                        idServicio: id,
+                        idBoda: idBoda,
+                        idUsuario: idUsuario,
+                        categoria: categoria,
+                        precio: precio,
+                        checkFavorito: '1',
+                        palabraClave: palabraClave
+                    };
+                        fetch('guardarClicks.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => response.text()) // Recibir respuesta del servidor
+                    .then(data => {
+                       alert(data); // Mostrar la respuesta del servidor
+                    })
+                    .catch(error => {
+                    console.error('Error:', error);
+                    });
+                }
+            });
+
         });
     });
+   
 </script>
 
 </body>

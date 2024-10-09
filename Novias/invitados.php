@@ -120,6 +120,7 @@ if (isset($_POST['updateStatus'])) {
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
                 <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">

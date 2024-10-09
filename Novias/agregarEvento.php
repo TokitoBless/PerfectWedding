@@ -32,15 +32,17 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
     // Convertir la lista de invitados en un formato serializable (ej. JSON o CSV)
     $invitados_serializados = json_encode($invitados);
 
-    // SQL para insertar la reunión en la base de datos (estilo directo)
     $sqlAgregar = "INSERT INTO eventos (idEvento, nombreEvento, descripcion, fecha, hora, duracion, invitados) 
                    VALUES ('$idBoda', '$nombreEvento', '$descripcion', '$fecha', '$hora', '$duracion', '$invitados_serializados')";
-
-    // Ejecutar la consulta
     $queryAgregar = $Conexion->query($sqlAgregar);
 
+    $detallesNotificacion = "Has sido invitdo al evento ". $nombreEvento .". La fecha y hora del evento es ". $fecha ." a las ". $hora .".";
+    $fecha = new DateTime();
+    $fechaCreacion = $fecha->format('Y-m-d H:i:s'); 
+
     if ($queryAgregar) {
-        // Redirigir al calendario después de guardar
+        $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idUsuario', 'Nuevo evento', '$fechaCreacion', '$detallesNotificacion' )";    
+        $queryGuardarElementoNotificacion = $Conexion->query($sqlGuardarNotificacion);
         header('Location: calendario.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '&success=Reunión guardada correctamente');
         exit();
     } else {

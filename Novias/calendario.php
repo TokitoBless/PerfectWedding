@@ -107,9 +107,10 @@ if ($mesSiguiente > 12) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
-                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -117,14 +118,14 @@ if ($mesSiguiente > 12) {
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
                             <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $id; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $idUsuario; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -135,14 +136,14 @@ if ($mesSiguiente > 12) {
 
 <h3>Calendario de reuniones</h3>
 <div style="text-align: right; margin-top: 20px; padding-right: 10px;">
-    <a class="btn btn-morado" type="submit" href="agregarEvento.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Agregar evento</a>
-    <a class="btn btn-morado" type="submit" href="agregarReunion.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Agregar videollamada</a>
+    <a class="btn btn-morado" type="submit" href="agregarEvento.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Agregar evento</a>
+    <a class="btn btn-morado" type="submit" href="agregarReunion.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Agregar videollamada</a>
 </div>
 
 <div class="calendario-nav">
-    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesAnterior; ?>&anio=<?php echo $anioAnterior; ?>">Mes Anterior</a>
+    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesAnterior; ?>&anio=<?php echo $anioAnterior; ?>"><img src="../Imagenes/antes.png" alt="MesAnterior" width="30" height="30"></a>
     <span><?php echo date('F Y', strtotime($primerDiaMes)); ?></span>
-    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesSiguiente; ?>&anio=<?php echo $anioSiguiente; ?>">Mes Siguiente</a>
+    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesSiguiente; ?>&anio=<?php echo $anioSiguiente; ?>"><img src="../Imagenes/siguiente.png" alt="MesSiguiente" width="30" height="30"></a>
 </div>
 
 <table>
