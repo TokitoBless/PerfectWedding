@@ -29,12 +29,41 @@ if ($queryCategoria->num_rows > 0) {
     $listaCategorias = implode(",", $categorias);
     
     // Consulta para obtener todos los servicios que coincidan con las categorías de los elementos
-    $sqlServicios = "
+    $alingresar = true; //logica inicio sesion
+    if($alingresar){
+        $sqlServicios = "(
+            SELECT * 
+            FROM servicios se
+            WHERE se.palabraClave IN (
+                SELECT palabra 
+                FROM palabrasclaves 
+                WHERE id IN (
+                    SELECT idPalabraClave
+                    FROM algoritmos
+                    WHERE idUsuario = '$idUsuario'
+                    GROUP BY idPalabraClave
+                    HAVING SUM(sugerido) >= 5
+                )
+            )
+            LIMIT 2
+        )
+        UNION ALL
+        (
+            SELECT * 
+            FROM servicios s
+            WHERE s.categoria IN ($listaCategorias)
+        )";
+    }else{
+        $sqlServicios = "
         SELECT * 
         FROM servicios s
         WHERE s.categoria IN ($listaCategorias)
-    ";
+        ";
+    }
     $queryServicios = $Conexion->query($sqlServicios);
+    $alingresar = false;
+    $sqlUpdate = "UPDATE algoritmos SET sugerido = '0' WHERE idEvento = $idBoda AND idUsuario = $idUsuario";
+    $queryUpdate = $Conexion->query($sqlUpdate);
 } else {
     echo "No se encontraron categorías asociadas a los elementos del evento.";
     exit();
@@ -473,7 +502,9 @@ if ($queryServicios->num_rows > 0) {
             })
             .then(response => response.text()) // Recibir respuesta del servidor
             .then(data => {
-                alert(data); // Mostrar la respuesta del servidor
+                if (data && data.trim() !== ''){
+                    alert(data); // Mostrar la respuesta del servidor
+                }
             })
             .catch(error => {
                console.error('Error:', error);
@@ -500,7 +531,9 @@ if ($queryServicios->num_rows > 0) {
                     })
                     .then(response => response.text()) // Recibir respuesta del servidor
                     .then(data => {
-                       alert(data); // Mostrar la respuesta del servidor
+                        if (data && data.trim() !== ''){
+                            alert(data); // Mostrar la respuesta del servidor
+                        }
                     })
                     .catch(error => {
                     console.error('Error:', error);
