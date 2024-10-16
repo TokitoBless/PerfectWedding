@@ -347,12 +347,20 @@ if ($queryServicios->num_rows > 0) {
     echo "<div class='card-container'>";
     while ($row = $queryServicios->fetch_assoc()) {
         $idServicio = $row['id'];
+        $idProveedor = $row['proveedor'];
         $nombreServicio = $row['nombreServicio'];
         $descripcionServicio = $row['descripcion'];
         $precio = $row['precio'];
         $calificacion = $row['calificacion'];
         $categoria = $row['categoria'];
         $palabraClave = $row['palabraClave'];
+
+        $sqlInformacionProveedor = "SELECT * FROM proveedores WHERE id = '$idProveedor'";
+        $queryInformacionProveedor= $Conexion->query($sqlInformacionProveedor);
+        $rowProveedor = $queryInformacionProveedor->fetch_assoc();
+
+        $nombreProveedor = $rowProveedor['nombre'] . " " . $rowProveedor['apellidoPaterno'] . " " . $rowProveedor['apellidoMaterno'];
+        $sitioWeb = $rowProveedor['sitioWeb'];
 
         // Preparar imágenes
         $imagenes = [];
@@ -365,7 +373,7 @@ if ($queryServicios->num_rows > 0) {
 
         echo "
         <div class='card' style='width: 12rem;' data-bs-toggle='modal' data-bs-target='#serviceModal' 
-            data-id='$idServicio' data-idUsuario='$idUsuario' data-idBoda='$idBoda' data-categoria='$categoria' data-palabraClave='$palabraClave' data-cali='$calificacion' data-images='" . json_encode($imagenes) . "' data-name='$nombreServicio' data-descrip='$descripcionServicio' data-precio='$precio'>
+            data-id='$idServicio' data-idUsuario='$idUsuario' data-idBoda='$idBoda' data-categoria='$categoria' data-palabraClave='$palabraClave' data-cali='$calificacion' data-images='" . json_encode($imagenes) . "' data-name='$nombreServicio' data-descrip='$descripcionServicio' data-precio='$precio' data-nombreProveedor='$nombreProveedor' data-sitioWeb='$sitioWeb'>
             <div class='card-img-container'>
                 <img src='{$imagenes[0]}' class='card-img-top' alt='$nombreServicio'>
             </div>
@@ -391,6 +399,13 @@ if ($queryServicios->num_rows > 0) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div class="icon-container">
+                    <div class="like-container" id="likeContainer">
+                        <!-- Aquí se insertará la imagen del like -->
+                    </div>
+                    <a  href="compartir.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>"><img src="../Imagenes/compartir.png" alt="Compartir" width="30" height="30"></a>
+                    <a  href="guardar.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>"><img src="../Imagenes/guardar.png" alt="Guardar" width="30" height="30"></a>
+                </div>
                 <div class="container ">
                     <div class="row justify-content-start">
                         <div class="col-4">
@@ -410,12 +425,13 @@ if ($queryServicios->num_rows > 0) {
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <b><p>Descripción</p></b>
-                            <p id="modalDescrip"></p>
-                            <b><p>Precio</p></b>
-                            <p id="modalPrecio"></p>
+                        <div class="col-8">
+                            <b>Descripción:</b><br> <span id="modalDescrip"></span><br>
+                            <b>Precio:</b><br> $<span id="modalPrecio"></span><br>
+                            <b>Nombre del proveedor:</b><br> <span id="modalNombreProveedor"></span><br>
+                            <b id="modalLabelSitioWeb">SitioWeb:</b><br> <span id="modalSitioWeb" ></span>
                         </div>
+
                     </div>
                     <center>
                         <label>Calificación:</label>
@@ -424,13 +440,10 @@ if ($queryServicios->num_rows > 0) {
                         </div>
                     </center>
                 </div>
-                <div>
-                    <label class="form-check-label">Favorito</label>
-                    <input class="form-check-input" type="checkbox" value="" id="checkFavorito">
-                </div>
+                
             </div>
             <div class="modal-footer">
-                <a class="btn btn-secondary" id="editarBtn" href="#" role="button">Presupuesto</a>
+                <a class="btn btn-secondary" id="solicitarPresupuestoBtn" href="#" role="button">Cotización</a>
             </div>
         </div>
     </div>
@@ -451,18 +464,26 @@ if ($queryServicios->num_rows > 0) {
             var precio = button.getAttribute('data-precio');
             var calificacion = button.getAttribute('data-cali');
             var palabraClave = button.getAttribute('data-palabraClave');
+            var nombreProveedor = button.getAttribute('data-nombreProveedor');
+            var sitioWeb = button.getAttribute('data-sitioWeb');
             
 
             var carouselImages = modal.querySelector('#carouselImages');            
             var modalName = modal.querySelector('#modalName');
             var modalDescrip = modal.querySelector('#modalDescrip');
             var modalPrecio = modal.querySelector('#modalPrecio');
-            var editarBtn = modal.querySelector('#editarBtn');
+            var solicitarPresupuestoBtn = modal.querySelector('#solicitarPresupuestoBtn');
+            var modalNombreProveedor = modal.querySelector('#modalNombreProveedor');
+            var modalSitioWeb = modal.querySelector('#modalSitioWeb');
+            var modalLabelSitioWeb = modal.querySelector('#modalLabelSitioWeb');
             var starContainer = modal.querySelector('#starContainer');
+            var likeContainer = document.querySelector('#likeContainer');
+            
 
             // Limpiar el contenido anterior
             carouselImages.innerHTML = '';
             starContainer.innerHTML = '';
+            likeContainer.innerHTML = '';
 
             images.forEach(function (image, index) {
                 var activeClass = index === 0 ? 'active' : '';
@@ -473,14 +494,27 @@ if ($queryServicios->num_rows > 0) {
                 carouselImages.insertAdjacentHTML('beforeend', carouselItem);
             });
 
-            for (var i = 0; i < calificacion; i++) {
-                starContainer.insertAdjacentHTML('beforeend', '<span class="fa fa-star checked"></span>');
+            //Crear elementos de la calificacion
+            for (var i = 1; i <= 5; i++) {
+                var starImg = document.createElement('img');
+                starImg.src = i <= calificacion ? '../Imagenes/estrella_completa.png' : '../Imagenes/estrella_vacia.png';
+                starImg.alt = 'Estrella';
+                starContainer.appendChild(starImg);
             }
+
 
             modalName.textContent = name;
             modalDescrip.textContent = descrip;
             modalPrecio.textContent = precio;
-            editarBtn.href = `solicitarPresupuesto.php?idServicio=${id}`;
+            modalNombreProveedor.textContent = nombreProveedor;
+            
+            if (!sitioWeb || sitioWeb.trim() === "") {
+                modalSitioWeb.textContent = "No hay sitio web";
+            } else {
+                modalSitioWeb.textContent = sitioWeb;
+            }
+
+            solicitarPresupuestoBtn.href = `solicitarPresupuesto.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
             
             // Enviar datos al servidor
             const data = {
@@ -510,9 +544,23 @@ if ($queryServicios->num_rows > 0) {
                console.error('Error:', error);
             });
 
-            // Escuchar cambios en los checkboxes
-            document.getElementById('checkFavorito').addEventListener('change', function() {
-                if (this.checked) {
+
+            var likeImg = document.createElement('img');
+            likeImg.id = 'likeIcon';
+            likeImg.src = '../Imagenes/like_vacio.png'; 
+            likeImg.alt = 'Like';
+            likeImg.style.cursor = 'pointer'; // Hacer que el cursor cambie a una mano cuando pasa sobre la imagen
+            likeContainer.appendChild(likeImg);
+
+            var isLiked = false;
+            // Escuchar cambios en la imagen
+            document.getElementById('likeIcon').addEventListener('click', function() {
+                const likeIcon = document.getElementById('likeIcon');
+                const isLiked = likeIcon.getAttribute('src') === '../Imagenes/like_completo.png'; // Verificar si está seleccionado
+
+                if (!isLiked) {
+                    likeIcon.setAttribute('src', '../Imagenes/like_completo.png');
+                    
                     const data = {
                         idServicio: id,
                         idBoda: idBoda,
@@ -522,7 +570,9 @@ if ($queryServicios->num_rows > 0) {
                         checkFavorito: '1',
                         palabraClave: palabraClave
                     };
-                        fetch('guardarClicks.php', {
+                    
+                    // Enviar la solicitud al servidor
+                    fetch('guardarClicks.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -531,15 +581,16 @@ if ($queryServicios->num_rows > 0) {
                     })
                     .then(response => response.text()) // Recibir respuesta del servidor
                     .then(data => {
-                        if (data && data.trim() !== ''){
+                        if (data && data.trim() !== '') {
                             alert(data); // Mostrar la respuesta del servidor
                         }
                     })
                     .catch(error => {
-                    console.error('Error:', error);
+                        console.error('Error:', error);
                     });
                 }
             });
+
 
         });
     });

@@ -151,3 +151,29 @@ color: black;
     flex-grow: 1;
     margin: 0 10px;
 }
+p {
+    display: inline;
+}
+
+.star-container {
+    display: flex;
+    align-items: center;
+    margin-left: 150px;
+}
+
+.star-container img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+.like-container img {
+    width: 30px;
+    height: 30px;
+}
+
+.icon-container {
+    display: flex;          /* Alinear los elementos en una sola línea */
+    justify-content: flex-end;  /* Alinearlos hacia la derecha */
+    align-items: center;     /* Alinear verticalmente los íconos si es necesario */
+    gap: 10px;               /* Espacio entre los íconos */
+}

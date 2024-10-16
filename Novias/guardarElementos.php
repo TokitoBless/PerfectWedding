@@ -19,7 +19,7 @@ if ($elementos && $idUsuario && $idBoda) {
         $prioridad = $elemento['prioridad'];
         
         // guardar los datos en la base de datos
-        $sqlGuardarElemento = "INSERT INTO elementosboda(evento, usuario, elemento, presupuesto,	prioridad) VALUE ('$idBoda', '$idUsuario', '$nombre', '$presupuesto', '$prioridad')";
+        $sqlGuardarElemento = "INSERT INTO elementosboda(evento, usuario, elemento, presupuesto, prioridad) VALUE ('$idBoda', '$idUsuario', '$nombre', '$presupuesto', '$prioridad')";
         $queryGuardarElemento = $Conexion->query($sqlGuardarElemento);
         if($queryGuardarElemento)
         {
