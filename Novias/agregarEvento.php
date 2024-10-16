@@ -4,6 +4,10 @@ include_once('../Conexion/conexion.php');
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     $idUsuario = $_GET['idUsuario'];
     $idBoda = $_GET['idBoda'];
+    $sqlfechaBoda= "SELECT fechaBoda from bodas where usuario = '$idUsuario' and idEvento = '$idBoda'";
+    $queryFechaBoda = $Conexion->query($sqlfechaBoda);
+    $row = $queryFechaBoda->fetch_assoc();
+    $fechaBoda = $row['fechaBoda'];
 } else {
     header('Location: agregarEvento.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
@@ -29,7 +33,7 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
         $invitados[] = $idUsuario;
     }
 
-    // Convertir la lista de invitados en un formato serializable (ej. JSON o CSV)
+    
     $invitados_serializados = json_encode($invitados);
 
     $sqlAgregar = "INSERT INTO eventos (idEvento, nombreEvento, descripcion, fecha, hora, duracion, invitados) 
@@ -38,7 +42,7 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
 
     $detallesNotificacion = "Has sido invitdo al evento ". $nombreEvento .". La fecha y hora del evento es ". $fecha ." a las ". $hora .".";
     $fecha = new DateTime();
-    $fechaCreacion = $fecha->format('Y-m-d H:i:s'); 
+    $fechaCreacion = $fecha->format('Y-m-d'); 
 
     if ($queryAgregar) {
         $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idUsuario', 'Nuevo evento', '$fechaCreacion', '$detallesNotificacion' )";    
@@ -135,7 +139,7 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
                 <label for="fecha">Fecha</label>
             </div>
             <div class="col-6">
-                <input type="date" id="fecha" name="fecha" class="form-control" required>
+                <input type="date" id="fecha" name="fecha" class="form-control" required onchange="validarFecha()">
             </div>
         </div>
 
@@ -211,3 +215,17 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
 
 </body>
 </html>
+
+<script>
+function validarFecha() {
+    const fechaInput = document.getElementById('fecha');
+    fechaHoy = new Date();
+    fechaHoy.setDate(fechaHoy.getDate() - 1); 
+    const fechaSeleccionada = new Date(fechaInput.value);
+    const fechaLimite = new Date('<?php echo $fechaBoda; ?>');
+    if (!((fechaSeleccionada >= fechaHoy) && (fechaSeleccionada < fechaLimite))) {
+        alert("La fecha seleccionada debe ser posterior a la actual y anterior a la fecha de la boda, favor de seleccionar otra.");
+        fechaInput.value = '';
+    }
+}
+</script>

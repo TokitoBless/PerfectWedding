@@ -11,7 +11,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
 
 // Consulta para obtener la categoría de los elementos de boda del usuario y evento
 $sqlCategoria = "
-    SELECT DISTINCT e.elemento 
+    SELECT DISTINCT e.elemento, presupuesto
     FROM elementosboda e 
     WHERE e.usuario = $idUsuario 
     AND e.evento = $idBoda
@@ -22,19 +22,48 @@ if ($queryCategoria->num_rows > 0) {
     // Obtenemos las categorías de los elementos del evento
     $categorias = [];
     while ($row = $queryCategoria->fetch_assoc()) {
+        $filtroCategorias[] = $row['elemento'];
         $categorias[] = "'" . $row['elemento'] . "'";
     }
     
     // Convertimos las categorías a una lista para la consulta SQL
     $listaCategorias = implode(",", $categorias);
-    
-    // Consulta para obtener todos los servicios que coincidan con las categorías de los elementos
-    $alingresar = true; //logica inicio sesion
-    if($alingresar){
+    $filtroListaCategorias = implode(",", $filtroCategorias);
+    $checkFiltrar = isset($_POST['checkFiltrar']) ? $_POST['checkFiltrar'] : '0';
+    if ($checkFiltrar == '1'){
+        $precioMax = isset($_POST['precioMax']) ? (int)$_POST['precioMax'] : 0;
+        $calificacion = isset($_POST['calificacion']) ? (int)$_POST['calificacion'] : 0;
+        $categoria = isset($_POST['categoria']) ? $_POST['categoria'] : '';
+        $palabraClave = isset($_POST['palabraClave']) ? $_POST['palabraClave'] : '';
+
+        // Armar consulta SQL con los filtros
+        $sqlServicios = "SELECT * FROM servicios WHERE categoria IN ($listaCategorias)";
+
+        if ($categoria != '') {
+            $sqlServicios .= " AND categoria = '$categoria'";
+        }
+
+        if ($palabraClave != '') {
+            $sqlServicios .= " AND palabraClave LIKE '%$palabraClave%'";
+        }
+
+        if ($precioMax > 0) {
+            $sqlServicios .= " AND precio <= $precioMax";
+        }
+
+        if ($calificacion > 0) {
+            $sqlServicios .= " AND calificacion >= $calificacion";
+        }
+    }
+    else{
+        // Consulta para obtener todos los servicios que coincidan con las categorías de los elementos
         $sqlServicios = "(
-            SELECT * 
+            SELECT se.* 
             FROM servicios se
-            WHERE se.palabraClave IN (
+            JOIN elementosboda e ON e.elemento = se.categoria
+            WHERE se.precio <= e.presupuesto
+            AND se.precio >= (0.7 * e.presupuesto)
+            AND se.palabraClave IN (
                 SELECT palabra 
                 FROM palabrasclaves 
                 WHERE id IN (
@@ -53,15 +82,8 @@ if ($queryCategoria->num_rows > 0) {
             FROM servicios s
             WHERE s.categoria IN ($listaCategorias)
         )";
-    }else{
-        $sqlServicios = "
-        SELECT * 
-        FROM servicios s
-        WHERE s.categoria IN ($listaCategorias)
-        ";
     }
     $queryServicios = $Conexion->query($sqlServicios);
-    $alingresar = false;
     $sqlUpdate = "UPDATE algoritmos SET sugerido = '0' WHERE idEvento = $idBoda AND idUsuario = $idUsuario";
     $queryUpdate = $Conexion->query($sqlUpdate);
 } else {
@@ -161,7 +183,7 @@ if ($queryPrecios->num_rows > 0) {
 
         <li>Filtrar por calificacion</li>
         <div class="calificacion-estrellas">
-            <img src="../Imagenes/circulo-vacio.png" class="estrella" data-calificacion="0" alt="0 estrellas" width="25" height="25">
+            <img src="../Imagenes/circulo-vacio.png" class="cero" data-calificacion="0" alt="0 estrellas" width="25" height="25">
             <img src="../Imagenes/estrella_vacia.png" class="estrella" data-calificacion="1" alt="1 estrella" width="30" height="30">
             <img src="../Imagenes/estrella_vacia.png" class="estrella" data-calificacion="2" alt="2 estrellas" width="30" height="30">
             <img src="../Imagenes/estrella_vacia.png" class="estrella" data-calificacion="3" alt="3 estrellas" width="30" height="30">
@@ -173,44 +195,17 @@ if ($queryPrecios->num_rows > 0) {
         <li>Filtrar por categoria</li>
 
         <!-- Select para las categorías -->
-            <select name="categoria" id="categoriaSelect" onchange="cargarPalabrasClaves()" required>
-                <option value=""></option>
-                <option value="Lugar">Lugar</option>
-                <option value="Vestido novia">Vestido novia</option>
-                <option value="Zapatos novia">Zapatos novia</option>
-                <option value="Velo">Velo</option>
-                <option value="Liga">Liga</option>
-                <option value="Maquillaje novia">Maquillaje novia</option>
-                <option value="Peinado novia">Peinado novia</option>
-                <option value="Joyería">Joyería</option>
-                <option value="Accesorios">Accesorios</option>
-                <option value="Ramos">Ramos</option>
-                <option value="Trajes">Trajes</option>
-                <option value="Corbatas">Corbatas</option>
-                <option value="Zapatos novio">Zapatos novio</option>
-                <option value="Pañuelos">Pañuelos</option>
-                <option value="Boutonniere">Boutonniere</option>
-                <option value="Decoración">Decoración</option>
-                <option value="Anillos">Anillos</option>
-                <option value="Centros de mesa">Centros de mesa</option>
-                <option value="Manteles">Manteles</option>
-                <option value="Música">Música</option>
-                <option value="Fotografía">Fotografía</option>
-                <option value="Video">Video</option>
-                <option value="Barra de banquete">Barra de banquete</option>
-                <option value="Pastel">Pastel</option>
-                <option value="Barra de bebidas">Barra de bebidas</option>
-                <option value="Mesa de postres">Mesa de postres</option>
-                <option value="Vestidos de damas">Vestidos de damas</option>
-                <option value="Zapatos de damas">Zapatos de damas</option>
-                <option value="Maquillaje de dama">Maquillaje de dama</option>
-                <option value="Peinado de dama">Peinado de dama</option>
-                <option value="Ramilletes">Ramilletes</option>
-                <option value="Invitaciones">Invitaciones</option>
-                <option value="Recuerdos">Recuerdos</option>
-            </select>
+
+        <select name="categoria" id="categoriaSelect" onchange="cargarPalabrasClaves()" required>
+            <option value=""></option>
+            <?php
+            foreach ($filtroCategorias as $categoria) {
+                echo "<option value='" . htmlspecialchars($categoria) . "'>" . htmlspecialchars($categoria) . "</option>";
+            }
+            ?>
+        </select>
         <br>
-            <div id="listaPalabras"></div>
+        <div id="listaPalabras"></div>
             
         
     </ul>
@@ -270,7 +265,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 actualizarEstrellas(calificacion);
             });
         });
+        var circulo = document.querySelector('.cero');
+        circulo.addEventListener('click', function() {
+            var calificacion = this.getAttribute('data-calificacion');
+            actualizarEstrellas(calificacion);
+        });
     });
+
+
+    
 </script>
 
 <script>//Filtro de categoria
@@ -306,37 +309,61 @@ function cargarPalabrasClaves() {
 
 <script>//Boton de filtrar
 
-function filtrarServicios() {
-    // Obtener la instancia del offcanvas
-    var offcanvasElement = document.getElementById('offcanvasRight');
-    var offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
-
-    // Cerrar el offcanvas si está abierto
-    if (offcanvas) {
-        offcanvas.hide();
-    }
-
-    const precioMax = document.getElementById('filtroPrecio').value;
+function filtrarServicios(){
+    function enviarDatos() {
+        const precioMax = document.getElementById('filtroPrecio').value;
     const calificacion = document.getElementById('calificacionSeleccionada').innerText;
     const categoria = document.getElementById('categoriaSelect').value;
     const palabraClave = document.getElementById('palabraClaveSelect') ? document.getElementById('palabraClaveSelect').value : '';
+    
+        // Crear un formulario
+        var form = document.createElement("form");
+        form.method = "POST";
+        form.action = "panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>";
 
-    const params = new URLSearchParams();
-    params.append('precioMax', precioMax);
-    params.append('calificacion', calificacion);
-    params.append('categoria', categoria);
-    params.append('palabraClave', palabraClave);
+        // Crear los campos del formulario
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "checkFiltrar";
+        input.value = "1";
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'filtrarServicios.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            document.querySelector('.card-container').innerHTML = xhr.responseText;
-        }
-    };
-    xhr.send(params.toString());
+        var input1 = document.createElement("input");
+        input1.type = "hidden";
+        input1.name = "precioMax";
+        input1.value = precioMax;
+
+        var input2 = document.createElement("input");
+        input2.type = "hidden";
+        input2.name = "calificacion";
+        input2.value = calificacion;
+
+        var input3 = document.createElement("input");
+        input3.type = "hidden";
+        input3.name = "categoria";
+        input3.value = categoria;
+
+        var input4 = document.createElement("input");
+        input4.type = "hidden";
+        input4.name = "palabraClave";
+        input4.value = palabraClave;
+
+        // Agregar los campos al formulario
+        form.appendChild(input);
+        form.appendChild(input1);
+        form.appendChild(input2);
+        form.appendChild(input3);
+        form.appendChild(input4);
+
+        // Agregar el formulario al body y enviarlo
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // Ejemplo de uso
+    enviarDatos();
+
 }
+
 
 </script>
 
@@ -384,7 +411,7 @@ if ($queryServicios->num_rows > 0) {
     }
     echo "</div>";
 } else {
-    echo "No se encontraron servicios disponibles para las categorías relacionadas.";
+    echo "No se encontraron servicios disponibles para las categorías relacionadas dentro del presupuesto.";
 }
 ?>
 
@@ -466,7 +493,6 @@ if ($queryServicios->num_rows > 0) {
             var palabraClave = button.getAttribute('data-palabraClave');
             var nombreProveedor = button.getAttribute('data-nombreProveedor');
             var sitioWeb = button.getAttribute('data-sitioWeb');
-            
 
             var carouselImages = modal.querySelector('#carouselImages');            
             var modalName = modal.querySelector('#modalName');

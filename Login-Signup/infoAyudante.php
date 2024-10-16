@@ -40,9 +40,9 @@ if (isset($_POST['UsuarioNovia'])) {
 <div class="card w-75 mb-3">
   <div class="card-body">
     <h5 class="card-title">Ingrese el usuario de la novia</h5>
-    <p class="card-text">La novia de la boda a la que desea ayudar le debe de proporsionar su nombre de usuario</p>
+    <p class="card-text">La novia o el novio que creo la boda a la que desea ayudar le debe de proporsionar su nombre de usuario</p>
     <form action="infoAyudante.php" method="post">
-        <input type="text" name = "UsuarioNovia" placeholder="Usuario de novia" required style="width: 400px; padding: 5px; ">
+        <input type="text" name = "UsuarioNovia" placeholder="Usuario de novia/o" required style="width: 400px; padding: 5px; ">
         <br><br>
         <button class="btn btn-dark" type="submit">Ingresar</button>
     </form>

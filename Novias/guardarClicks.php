@@ -68,7 +68,7 @@ if(mysqli_num_rows($querychecarPresupuesto) > 0){
         $costoPromedioTotal = $row['totalCosto']/$row['totalContador'];
         $fecha = new DateTime();
         $fechaCreacion = $fecha->format('Y-m-d H:i:s'); 
-        $notificacion = "Ya te pasaste con el presupuesto en la categoria " . $categoria . " viendo servicios con un costo promedio de: $" . $costoPromedioTotal . ", tu presupuesto inicial es de: $" . $presupuesto;
+        $notificacion = "Has visto varios servicios en la categoria " . $categoria . " con un costo promedio de: $" . $costoPromedioTotal . ", recuerda que tu presupuesto inicial es de: $" . $presupuesto;
         $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idUsuario', 'Precios mayores al presupuesto', '$fechaCreacion', '$notificacion')";    
         $queryGuardarElementoNotificacion = $Conexion->query($sqlGuardarNotificacion);
         echo $notificacion;

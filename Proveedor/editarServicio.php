@@ -27,13 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $precioServicio = validar($_POST['precioServicio']);
     $palabraClave = validar($_POST['palabraClave']);
     $imagenEliminar = isset($_POST['imagenEliminar']) ? $_POST['imagenEliminar'] : null;
-
+    
     // Actualizar datos del servicio
     $sqlActualizar = "UPDATE servicios SET descripcion = '$descripcion', precio = '$precioServicio', palabraClave = '$palabraClave' WHERE id = '$id'";
     $Conexion->query($sqlActualizar);
 
     // Manejo de imágenes
-    
 
     for ($i = 1; $i <= 5; $i++) {
         $numeroImagen = "imagen" . $i;
@@ -153,27 +152,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col">
                 <label for="img">Imágenes del Servicio (Máximo 5)</label>
                 <div id="contenedor-imagenes">
-                    <?php
-                    // Mostrar imágenes ya guardadas
-                    for ($i = 1; $i <= 5; $i++) {
-                        $numeroImagen = "imagen" . $i;
-                        if (!empty($servicio[$numeroImagen])) {
-                            // Mostrar imagen
-                            $imagen = 'data:image/jpeg;base64,' . base64_encode($servicio[$numeroImagen]);
-                            echo "<div class='subida-imagen' data-imagen='$i'>";
-                            echo "<img src='$imagen' class='card-img-top' style='width: 100px; height: 100px;' alt='Imagen $i'>";
-                            
-                            // Botón para subir una nueva imagen
-                            echo "<input type='file' name='imagen$i' accept='image/*'>";
-                            echo "</div><br>";
-                        } else {
-                            // Mostrar campo de subida de imagen si no hay imagen guardada
-                            echo "<div class='subida-imagen'>";
-                            echo "<input type='file' name='imagen$i' accept='image/*'>";
-                            echo "</div><br>";
-                        }
+                <?php
+                // Mostrar imágenes ya guardadas
+                for ($i = 1; $i <= 5; $i++) {
+                    $numeroImagen = "imagen" . $i;
+                    if (!empty($servicio[$numeroImagen])) {
+                        // Mostrar imagen
+                        $imagen = 'data:image/jpeg;base64,' . base64_encode($servicio[$numeroImagen]);
+                        echo "<div class='subida-imagen' id='imagen-div-$i'>";
+                        echo "<div id='imagen-$i'>";
+                        echo "<img src='$imagen' class='card-img-top' style='width: 100px; height: 100px;' alt='Imagen $i'>";
+                        echo "</div>";
+                        // Botón para subir una nueva imagen
+                        echo "<input type='file' name='imagen$i' accept='image/*'>";
+                        echo "<a href='#' onclick='eliminarImagen(event, $i)'><img src='../Imagenes/eliminar.png' alt='Eliminar' width='20' height='20'></a>";
+                        echo "</div><br>";
+                    } else {
+                        // Mostrar campo de subida de imagen si no hay imagen guardada
+                        echo "<div class='subida-imagen' id='imagen-div-$i'>";
+                        echo "<input type='file' name='imagen$i' accept='image/*'>";
+                        echo "<a href='#' onclick='eliminarImagen(event, $i)'><img src='../Imagenes/eliminar.png' alt='Eliminar' width='20' height='20'></a>";
+                        echo "</div><br>";
                     }
-                    ?>
+                }
+                ?>
                 </div>
             </div>
         </div>
@@ -189,3 +191,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+
+<script>
+function eliminarImagen(event, imagenIndex) {
+    event.preventDefault(); // Evita que el enlace siga su comportamiento por defecto
+    // Oculta el contenedor de la imagen
+    document.getElementById('imagen-' + imagenIndex).style.display = 'none';
+    // Actualiza el campo oculto con el índice de la imagen a eliminar
+    document.getElementById('imagenEliminar').value = imagenIndex;
+
+}
+</script>
+
+
