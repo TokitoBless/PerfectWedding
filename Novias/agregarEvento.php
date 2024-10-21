@@ -182,7 +182,7 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
             <div class="col-6">
                 <select id="invitados" name="invitados[]" class="form-control" multiple="multiple" required>
                     <?php
-                    // Aquí obtendrás los invitados de la base de datos
+                    // Agarrar los invitados
                     $sql = "SELECT id, nombreCompleto, invitadoDe FROM invitados WHERE idEvento = '$idBoda'";
                     $resultado = $Conexion->query($sql);
                     if ($resultado->num_rows > 0) {

@@ -20,7 +20,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])&& isset($_GET['idServici
     $nombreServicio = $row['nombreServicio'];
 
 } else {
-    header('Location: solicitarPresupuesto.php?error="No se proporcionó IDs"');
+    header('Location: compartir.php?error="No se proporcionó IDs"');
     exit();
 }
 
@@ -60,7 +60,7 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <title>Solicitar cotización</title>
+    <title>Compartir servicio</title>
     
 </head>
 <body>
@@ -101,23 +101,47 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
     </div>
 </nav>
 <br>
-<h3>Solicitar cotización del servicio <?php echo htmlspecialchars($nombreServicio); ?></h3>
+<h3>Compartir servicio <?php echo htmlspecialchars($nombreServicio); ?></h3>
 <br>
     
 <div class="container d-flex justify-content-center">
-  <form action="solicitarPresupuesto.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>" method="POST" class="w-50">
+  <form action="compartir.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>" method="POST" class="w-50">
 
 
     <div class="row">
-      <div class="col-12 text-center">
-        <label for="fechaBoda">Fecha de  la boda</label>
-        <input type="text" id="fechaBoda" name="fechaBoda" class="form-control" value="<?php echo htmlspecialchars($fechaBoda); ?>" readonly>
-        <br><br>
-        <label>Detalles de la solicitud</label>
-        <textarea id="detalles" name="detalles" class="form-control" required></textarea>
-        <br>
-        <button type="submit" class="btn btn-rosa">Guardar</button>
-      </div>
+        <div class="col-12 text-center">
+            <label>Nombre de la persona a compartir</label>
+            <br><br>
+            <select id="invitados" name="invitados[]" class="form-control" multiple="multiple" required>
+                    <?php
+                    // Agarrar los invitados
+                    $sqlIdAyudante = "SELECT idUsuario FROM ayudantes WHERE idEvento = '$idBoda'";
+                    $queryIdAyudante = $Conexion->query($sqlIdAyudante);
+
+                    if ($queryIdAyudante->num_rows > 0) {
+                        while($row = $queryIdAyudante->fetch_assoc()) {
+                            $idAyudante = $row['idUsuario'];
+
+                            $sqlNombreAyudante = "SELECT id, usuario FROM usuarios WHERE id = '$idAyudante'";
+                            $queryNombreAyudante = $Conexion->query($sqlNombreAyudante);
+                            $rowNombre = $queryNombreAyudante->fetch_assoc();
+                            echo "<option value='".$rowNombre['id']."'>".$rowNombre['usuario']."</option>";
+                        }
+                    }
+                    ?>
+                </select>
+
+                <script>
+                $(document).ready(function() {
+                    $('#invitados').select2({
+                        placeholder: "Selecciona los invitados",
+                        allowClear: true,
+                    });
+                });
+                </script> 
+            <br><br>
+            <button type="submit" class="btn btn-rosa">Guardar</button>
+        </div>
     </div>
   </form>
 </div>

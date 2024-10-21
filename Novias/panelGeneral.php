@@ -430,8 +430,8 @@ if ($queryServicios->num_rows > 0) {
                     <div class="like-container" id="likeContainer">
                         <!-- Aquí se insertará la imagen del like -->
                     </div>
-                    <a  href="compartir.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>"><img src="../Imagenes/compartir.png" alt="Compartir" width="30" height="30"></a>
-                    <a  href="guardar.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>"><img src="../Imagenes/guardar.png" alt="Guardar" width="30" height="30"></a>
+                    <a  href="compartir.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>"><img src="../Imagenes/compartir.png" alt="Compartir" width="30" height="30"></a>
+                    <a  href="guardar.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>"><img src="../Imagenes/guardar.png" alt="Guardar" width="30" height="30"></a>
                 </div>
                 <div class="container ">
                     <div class="row justify-content-start">

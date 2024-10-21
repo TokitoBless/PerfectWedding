@@ -3,15 +3,34 @@ include_once('../Conexion/conexion.php');
 
 if (isset($_POST['UsuarioNovia'])) {
     $UsuarioNovia = $_POST['UsuarioNovia'];
-    
-    $sqlUsuario = "SELECT * FROM usuarios WHERE usuario = '$UsuarioNovia' AND tipoUsuario = 'Novia'";
-    $queryUsuario = $Conexion->query($sqlUsuario);
+    //agarrar idUsuario
+    $sqlIdUsuario = "SELECT id FROM usuarios WHERE usuario = '$UsuarioNovia'";
+    $queryIdUsuario = $Conexion->query($sqlIdUsuario);
 
-    if(mysqli_num_rows($queryUsuario) > 0){
+    if(mysqli_num_rows($queryIdUsuario) > 0)
+    {
+      $row = mysqli_fetch_row($queryIdUsuario);
+      $idUsuario = $row[0];
+
+      //Verificar si esta en la boda
+      $sqlUsuario = "SELECT * FROM bodas WHERE usuario = '$idUsuario'";
+      $queryUsuario = $Conexion->query($sqlUsuario);
+
+      if(mysqli_num_rows($queryUsuario) > 0){
+        $row = mysqli_fetch_row($queryUsuario);
+        $idEvento = $row[0];
+        $sqlIngresarAyudante = "INSERT INTO ayudantes (idEvento, idUsuario) VALUES ('$idEvento', '$idUsuario')";
+        $queryIngresarAyudante = $Conexion->query($sqlIngresarAyudante);
         echo '<script language="javascript">alert("Bienvenido");</script>';
-    }else {
+        //header("Location: .php?idUsuario=$idUsuario&idBoda=$idBoda");
+        exit();
+      }else {
         echo '<script language="javascript">alert("El usuario es incorrecto");</script>';
+      }
+    }else {
+      echo '<script language="javascript">alert("El usuario es incorrecto");</script>';
     }
+    
 }
 
 ?>
