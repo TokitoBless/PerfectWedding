@@ -127,6 +127,7 @@ th{
     text-overflow: ellipsis; 
     white-space: nowrap;
     cursor: pointer;
+    border-radius: 5px;
 }
 .evento{
     background-color: #ffd54f;
@@ -139,4 +140,3 @@ th{
     text-align: center;
     margin: 10px 0;
 }
-

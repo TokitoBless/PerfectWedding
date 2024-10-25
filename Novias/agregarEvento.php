@@ -36,8 +36,7 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
     
     $invitados_serializados = json_encode($invitados);
 
-    $sqlAgregar = "INSERT INTO eventos (idEvento, nombreEvento, descripcion, fecha, hora, duracion, invitados) 
-                   VALUES ('$idBoda', '$nombreEvento', '$descripcion', '$fecha', '$hora', '$duracion', '$invitados_serializados')";
+    $sqlAgregar = "INSERT INTO eventos (idEvento, nombreEvento, descripcion, fecha, hora, duracion, invitados) VALUES ('$idBoda', '$nombreEvento', '$descripcion', '$fecha', '$hora', '$duracion', '$invitados_serializados')";
     $queryAgregar = $Conexion->query($sqlAgregar);
 
     $detallesNotificacion = "Has sido invitdo al evento ". $nombreEvento .". La fecha y hora del evento es ". $fecha ." a las ". $hora .".";
@@ -85,8 +84,21 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mensajes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -96,12 +108,11 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
                             <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $idUsuario; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -181,16 +192,22 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
             </div>
             <div class="col-6">
                 <select id="invitados" name="invitados[]" class="form-control" multiple="multiple" required>
-                    <?php
-                    // Agarrar los invitados
-                    $sql = "SELECT id, nombreCompleto, invitadoDe FROM invitados WHERE idEvento = '$idBoda'";
-                    $resultado = $Conexion->query($sql);
-                    if ($resultado->num_rows > 0) {
-                        while($row = $resultado->fetch_assoc()) {
-                            echo "<option value='".$row['id']."'>".$row['nombreCompleto']." (".$row['invitadoDe'].")</option>";
+                        <?php
+                        // Agarrar los invitados
+                        $sqlIdAyudante = "SELECT idUsuario FROM ayudantes WHERE idEvento = '$idBoda'";
+                        $queryIdAyudante = $Conexion->query($sqlIdAyudante);
+
+                        if ($queryIdAyudante->num_rows > 0) {
+                            while($row = $queryIdAyudante->fetch_assoc()) {
+                                $idAyudante = $row['idUsuario'];
+
+                                $sqlNombreAyudante = "SELECT id, usuario, correo FROM usuarios WHERE id = '$idAyudante'";
+                                $queryNombreAyudante = $Conexion->query($sqlNombreAyudante);
+                                $rowNombre = $queryNombreAyudante->fetch_assoc();
+                                echo "<option value='".$rowNombre['id']."'>".$rowNombre['usuario']." (".$rowNombre['correo'].")</option>";
+                            }
                         }
-                    }
-                    ?>
+                        ?>
                 </select>
 
                 <script>

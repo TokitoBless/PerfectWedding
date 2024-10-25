@@ -26,15 +26,32 @@ $ultimoDiaMes = date("Y-m-t", strtotime($primerDiaMes)); // Último día del mes
 $sqlEventos = "SELECT nombreEvento, descripcion, fecha, hora, duracion, invitados FROM eventos WHERE idEvento = '$idBoda' AND fecha BETWEEN '$primerDiaMes' AND '$ultimoDiaMes'";
 $sqlReuniones = "SELECT nombreReunion, temas, fecha, hora, invitados, link FROM reuniones WHERE idEvento = '$idBoda' AND fecha BETWEEN '$primerDiaMes' AND '$ultimoDiaMes'";
 
-$resultEventos = $Conexion->query($sqlEventos);
-$resultReuniones = $Conexion->query($sqlReuniones);
+$queryEventos = $Conexion->query($sqlEventos);
+$queryReuniones = $Conexion->query($sqlReuniones);
 
 // Almacenar eventos y reuniones en un array solo si el usuario está invitado
 $calendario = [];
 
-while ($row = $resultEventos->fetch_assoc()) {
+function obtenerNombresInvitados($invitadosArray, $Conexion) {
+    // Convierte el array de IDs en una lista separada por comas para la consulta
+    $invitadosIds = implode(',', array_map('intval', $invitadosArray));
+    
+    // Consulta para obtener los nombres de los invitados
+    $sqlInvitados = "SELECT usuario FROM usuarios WHERE id IN ($invitadosIds)";
+    $queryInvitados = $Conexion->query($sqlInvitados);
+
+    $nombresInvitados = [];
+    while ($rowInvitado = $queryInvitados->fetch_assoc()) {
+        $nombresInvitados[] = $rowInvitado['usuario'];
+    }
+    
+    return implode(', ', $nombresInvitados); // Retorna una cadena con los nombres separados por comas
+}
+
+while ($row = $queryEventos->fetch_assoc()) {
     $invitados = json_decode($row['invitados'], true); // Convertir invitados a array
     if (in_array($idUsuario, $invitados)) {
+        $nombresInvitados = obtenerNombresInvitados($invitados, $Conexion);
         $calendario[] = [
             'tipo' => 'evento',
             'nombre' => $row['nombreEvento'],
@@ -42,21 +59,22 @@ while ($row = $resultEventos->fetch_assoc()) {
             'fecha' => $row['fecha'],
             'hora' => $row['hora'],
             'duracion' => $row['duracion'],
-            'invitados' => $row['invitados']
+            'invitados' => $nombresInvitados
         ];
     }
 }
 
-while ($row = $resultReuniones->fetch_assoc()) {
+while ($row = $queryReuniones->fetch_assoc()) {
     $invitados = json_decode($row['invitados'], true); // Convertir invitados a array
     if (in_array($idUsuario, $invitados)) {
+        $nombresInvitados = obtenerNombresInvitados($invitados, $Conexion);
         $calendario[] = [
             'tipo' => 'reunion',
             'nombre' => $row['nombreReunion'],
             'temas' => $row['temas'],
             'fecha' => $row['fecha'],
             'hora' => $row['hora'],
-            'invitados' => $row['invitados'],
+            'invitados' => $nombresInvitados,
             'link' => $row['link']
         ];
     }
@@ -108,9 +126,21 @@ if ($mesSiguiente > 12) {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
-                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mensajes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -120,12 +150,11 @@ if ($mesSiguiente > 12) {
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
                             <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $idUsuario; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -140,11 +169,34 @@ if ($mesSiguiente > 12) {
     <a class="btn btn-morado" type="submit" href="agregarReunion.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Agregar videollamada</a>
 </div>
 
+<?php
+// Arreglo de meses en español
+$mesesEspanol = [
+    1 => 'Enero', 
+    2 => 'Febrero', 
+    3 => 'Marzo', 
+    4 => 'Abril', 
+    5 => 'Mayo', 
+    6 => 'Junio', 
+    7 => 'Julio', 
+    8 => 'Agosto', 
+    9 => 'Septiembre', 
+    10 => 'Octubre', 
+    11 => 'Noviembre', 
+    12 => 'Diciembre'
+];
+?>
+
 <div class="calendario-nav">
-    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesAnterior; ?>&anio=<?php echo $anioAnterior; ?>"><img src="../Imagenes/antes.png" alt="MesAnterior" width="30" height="30"></a>
-    <span><?php echo date('F Y', strtotime($primerDiaMes)); ?></span>
-    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesSiguiente; ?>&anio=<?php echo $anioSiguiente; ?>"><img src="../Imagenes/siguiente.png" alt="MesSiguiente" width="30" height="30"></a>
+    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesAnterior; ?>&anio=<?php echo $anioAnterior; ?>">
+        <img src="../Imagenes/antes.png" alt="MesAnterior" width="30" height="30">
+    </a>
+    <span><?php echo $mesesEspanol[$mesActual] . " " . $anioActual; ?></span>
+    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesSiguiente; ?>&anio=<?php echo $anioSiguiente; ?>">
+        <img src="../Imagenes/siguiente.png" alt="MesSiguiente" width="30" height="30">
+    </a>
 </div>
+
 
 <table>
     <thead>
@@ -162,7 +214,7 @@ if ($mesSiguiente > 12) {
         <!-- Aquí se rellenarán las celdas del calendario -->
     </tbody>
 </table>
-
+<br>
 <!-- Modal -->
 <div class="modal fade" id="detalleModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

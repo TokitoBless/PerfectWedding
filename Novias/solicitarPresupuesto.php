@@ -32,9 +32,9 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
     return $data;
   }
     $detalles = validar($_POST['detalles']);
-    
+    $fecha = date("Y-m-d H:i:s");
    
-    $sqlAgregar = "INSERT INTO cotizaciones (idEvento, idUsuario, idServicio, detalles) VALUES ('$idBoda', '$idUsuario', '$idServicio', '$detalles')";
+    $sqlAgregar = "INSERT INTO mensajes (idBoda, idUsuario, idServicio, remitente, mensaje, fecha) VALUES ('$idBoda', '$idUsuario', '$idServicio', 'i', '$detalles', '$fecha')";
     $queryAgregar = $Conexion->query($sqlAgregar);
 
     if ($queryAgregar) {
@@ -79,7 +79,19 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
                 <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
-                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mensajes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">

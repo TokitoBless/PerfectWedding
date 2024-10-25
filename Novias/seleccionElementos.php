@@ -25,39 +25,13 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
 </head>
 <body>
 
-<nav class="navbar navbar-complex navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <div class="title_nav">
-            <img src="../Imagenes/Wedding planner.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
-            <span>Perfect Wedding</span>
-        </div>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $id; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="conversaciones.php?id=<?php echo $id; ?>">Tabla kanban</a>
-                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            Tableros
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="#">Tableros favoritos</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                        </li>
-                    </ul>
-                </div>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $id; ?>">
-                    <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
-                </a>
-            </div>
-        </div>
-    </div>
+<nav class="navbar bg-body-tertiary">
+  <div class="container-fluid">
+    <p class="title_nav">
+      <img src="../Imagenes/Wedding planner.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
+      Perfect Wedding
+    </p>
+  </div>
 </nav>
 
 <div style="display: flex; align-items: center;">

@@ -9,44 +9,28 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     $row = $queryFechaBoda->fetch_assoc();
     $fechaBoda = $row['fechaBoda'];
 } else {
-    header('Location: agregarReunion.php?error="No se proporcionó ID de usuario ni de boda"');
+    header('Location: agregarTareas.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
 }
 
-if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fechaReunion']) && isset( $_POST['horaReunion']) && isset($_POST['linkZoom'])) {
-  function validar($data){
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-  }
-    $nombreReunion = validar($_POST['nombreReunion']);
-    $temas = validar($_POST['temas']);
-    $fechaReunion = validar($_POST['fechaReunion']);
-    $horaReunion = validar($_POST['horaReunion']);
-    $linkZoom = validar($_POST['linkZoom']);
-    $invitados = isset($_POST['invitados']) ? $_POST['invitados'] : array();
-    
-    // Agregar al usuario que crea la reunión como invitado
-    if (!in_array($idUsuario, $invitados)) {
-        $invitados[] = $idUsuario;
-    }
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $titulo = $_POST['tituloTarea'];
+    $tipoTarea = $_POST['tipoTarea'];
+    $tareaPadre =  isset($_POST['tareaPadre']) ? $_POST['tareaPadre'] : '';
+    $descripcion = $_POST['descripcion'];
+    $encargado = $_POST['encargado'];
+    $titulo = $_POST['tituloTarea'];
+    $fecha = $_POST['fechaTarea'];
+    $prioridad = $_POST['prioridad'];
 
-    $invitados_serializados = json_encode($invitados);
+    $sqlAgregar = "INSERT INTO tareas (idBoda, idUsuario, idTarea, titulo, descripcion, idEncargado, fecha, prioridad, porcentaje, estatus, aprobado) 
+                   VALUES ('$idBoda', '$idUsuario', '$tareaPadre', '$titulo', '$descripcion', '$encargado', '$fecha', '$prioridad', '0', 'Pendiente', '0')";
 
-    $sqlAgregar = "INSERT INTO reuniones (idEvento, nombreReunion, temas, fecha, hora, invitados, link) VALUES ('$idBoda', '$nombreReunion', '$temas', '$fechaReunion', '$horaReunion', '$invitados_serializados', '$linkZoom')";
     $queryAgregar = $Conexion->query($sqlAgregar);
 
-    if ($queryAgregar) {
-        header('Location: calendario.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '&success=Reunión guardada correctamente');
-        exit();
-    } else {
-        echo "Error al guardar la reunión: " . $Conexion->error;
-    }
+
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -55,14 +39,13 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="stylesCalendario.css">
-    <title>Nueva reunion</title>
-    
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Tabla kanban</title>
 </head>
 <body>
 
@@ -113,61 +96,60 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
         </div>
     </div>
 </nav>
-<br>
-<h3>Nueva reunion</h3>
 
-    
-<div class="container d-flex justify-content-center">
-  <form action="agregarReunion.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>" method="POST" class="w-50">
-    <div class="row mb-3">
-      <!-- Nombre de la Reunión -->
-      <div class="col-6 text-end">
-        <label for="nombreReunion">Nombre de la Reunión</label>
-      </div>
-      <div class="col-6">
-        <input type="text" id="nombreReunion" name="nombreReunion" class="form-control" minlength="15" required>
-      </div>
-    </div>
+<h3>Tabla kanban</h3>    
 
-    <div class="row mb-3">
-      <!-- Temas a Abordar -->
-      <div class="col-6 text-end">
-        <label for="temas">Temas a abordar</label>
-      </div>
-      <div class="col-6">
-        <textarea id="temas" name="temas" class="form-control" minlength="50" maxlength="200"  required></textarea>
-      </div>
-    </div>
+<div style="width: 700px; padding-left: 50px;">
+    <form action="agregarTareas.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>" method="POST">
+    <!-- Titulo -->
+        <div class="row mb-4">
+            <label class="col-sm-3 col-form-label">Título:</label>
+            <div class="col-sm-9">
+                <input type="text" id="tituloTarea" name="tituloTarea" required class="form-control" minlength="5" >
+            </div>
+        </div>
+       
+    <!-- Tipo de tarea -->
+        <div class="row mb-4">
+            <label class="col-sm-3 col-form-label">Tipo:</label>
+            <div class="col-sm-9">
+                <select id="tipoTarea" name="tipoTarea" required class="form-control">
+                    <option value="">Seleccione una opcion</option>
+                    <option value="Tarea">Tarea</option>
+                    <option value="Subtarea">Subtarea</option>
+                </select>
+            </div>
+        </div>
 
-    <div class="row mb-3">
-      <!-- Fecha de la Reunión -->
-      <div class="col-6 text-end">
-        <label for="fechaReunion">Fecha</label>
-      </div>
-      <div class="col-6">
-        <input type="date" id="fechaReunion" name="fechaReunion" class="form-control" required onchange="validarFecha()">
-      </div>
-    </div>
+    <!-- Nombre de la tarea padre -->
+        <div id="tareaPadre" style="display: none;">    
+            <div class="row mb-4">
+                <label class="col-sm-3 col-form-label">Nombre de la tarea:</label>            
+                <div class="col-sm-9">
+                    <select id="tareaPadre" name="tareaPadre" class="form-control">
+                    <?php
+                        $sqlTarea = "SELECT id, titulo FROM tareas WHERE idboda = '$idBoda'";
+                        $queryTarea = $Conexion->query($sqlTarea);
+                        if ($queryTarea->num_rows > 0) {
+                            echo "<option value='' disabled selected>Seleccione una opcion</option>";
+                            while($row = $queryTarea->fetch_assoc()) {
+                                echo "<option value='".$row['id']."'>".$row['titulo']."</option>";
+                            }
+                        }else {
+                            echo "<option value='' disabled selected>No hay tareas crea una primero, por favor</option>";
+                        }
+                    ?>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-    <div class="row mb-3">
-      <!-- Hora de la Reunión -->
-      <div class="col-6 text-end">
-        <label for="horaReunion">Hora</label>
-      </div>
-      <div class="col-6">
-        <input type="time" id="horaReunion" name="horaReunion" class="form-control" min="08:00" max="22:00" required>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <!-- Invitados -->
-      <div class="col-6 text-end">
-        <label for="invitados">Invitados</label>
-      </div>
-      <div class="col-6">
-        <select id="invitados" name="invitados[]" class="form-control" multiple="multiple" required>
+    <!-- Nombre del encargado -->
+        <div class="row mb-4">
+            <label class="col-sm-3 col-form-label">Nombre Encargado:</label>
+            <div class="col-sm-9">
+            <select id="encargado" name="encargado" class="form-control" required>
                 <?php
-                // Agarrar los invitados
                 $sqlIdAyudante = "SELECT idUsuario FROM ayudantes WHERE idEvento = '$idBoda'";
                 $queryIdAyudante = $Conexion->query($sqlIdAyudante);
 
@@ -175,10 +157,10 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
                     while($row = $queryIdAyudante->fetch_assoc()) {
                         $idAyudante = $row['idUsuario'];
 
-                        $sqlNombreAyudante = "SELECT id, usuario, correo FROM usuarios WHERE id = '$idAyudante'";
+                        $sqlNombreAyudante = "SELECT id, usuario FROM usuarios WHERE id = '$idAyudante'";
                         $queryNombreAyudante = $Conexion->query($sqlNombreAyudante);
                         $rowNombre = $queryNombreAyudante->fetch_assoc();
-                        echo "<option value='".$rowNombre['id']."'>".$rowNombre['usuario']." (".$rowNombre['correo'].")</option>";
+                        echo "<option value='".$rowNombre['id']."'>".$rowNombre['usuario']."</option>";
                     }
                 }
                 ?>
@@ -186,48 +168,79 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
 
         <script>
           $(document).ready(function() {
-              $('#invitados').select2({
-              placeholder: "Selecciona los invitados",
+              $('#encargado').select2({
+              placeholder: "Selecciona a un encargado",
               allowClear: true,
               });
           });
         </script> 
-      </div>
-    </div>
+            </div>
+        </div>
 
-    <div class="row mb-3">
-      <!-- Link de Zoom -->
-      <div class="col-6 text-end">
-        <label for="linkZoom">Link de Zoom</label>
-      </div>
-      <div class="col-6">
-        <input type="url" id="linkZoom" name="linkZoom" class="form-control" required>
-      </div>
-    </div>
+    <!-- Descripcion -->
+        <div class="row mb-4">
+            <label class="col-sm-3 col-form-label">Descripción Tarea:</label>
+            <div class="col-sm-9">
+                <textarea id="descripcion" name="descripcion" required class="form-control" minlength="20"></textarea>
+            </div>
+        </div>
+        
+    <!-- Fecha -->
+        <div class="row mb-4">
+            <label class="col-sm-3 col-form-label">Fecha limite:</label>
+            <div class="col-sm-9">
+                <input type="date" id="fechaTarea" name="fechaTarea" required class="form-control"  onchange="validarFecha()">
+            </div>
+        </div>
 
-    <!-- Botón Guardar -->
-    <div class="row">
-      <div class="col-12 text-center">
-        <button type="submit" class="btn btn-rosa">Guardar</button>
-      </div>
-    </div>
-  </form>
+    <!-- Prioridad -->
+        <div class="row mb-4">
+            <label class="col-sm-3 col-form-label">Prioridad:</label>
+            <div class="col-sm-9">
+                <select id="prioridad" name="prioridad" required class="form-control">
+                    <option value="">Seleccione una opcion</option>
+                    <option value="1">Alta</option>
+                    <option value="0">Baja</option>
+                </select>
+            </div>
+        </div>
+
+        <center>
+            <button type="submit" class="btn btn-rosa">Agregar</button><br><br>
+        </center>
+        
+    </form>
 </div>
-
-</body>
-</html>
-
-
 <script>
+    document.getElementById('tipoTarea').addEventListener('change', function() {
+        var tareaPadre = document.getElementById('tareaPadre');
+        if (this.value === 'Subtarea') {
+            tareaPadre.setAttribute('required', 'required');
+            tareaPadre.style.display = 'block';
+        } else {
+            tareaPadre.removeAttribute('required');
+            tareaPadre.style.display = 'none';
+        }
+    });
+
 function validarFecha() {
-    const fechaInput = document.getElementById('fechaReunion');
+    const fechaInput = document.getElementById('fechaTarea');
     fechaHoy = new Date();
     fechaHoy.setDate(fechaHoy.getDate() - 1); 
     const fechaSeleccionada = new Date(fechaInput.value);
     const fechaLimite = new Date('<?php echo $fechaBoda; ?>');
+    const fecha10dias = new Date(fechaHoy); 
+    fecha10dias.setDate(fecha10dias.getDate() + 10);
+
     if (!((fechaSeleccionada >= fechaHoy) && (fechaSeleccionada < fechaLimite))) {
         alert("La fecha seleccionada debe ser posterior a la actual y anterior a la fecha de la boda, favor de seleccionar otra.");
         fechaInput.value = '';
     }
+    if (!((fechaSeleccionada >= fecha10dias))) {
+        alert("La fecha seleccionada debe ser igual o superior a 10 días a partir de la fecha actual, favor de seleccionar otra.");
+        fechaInput.value = '';
+    }
 }
 </script>
+</body>
+</html>

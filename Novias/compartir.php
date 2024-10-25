@@ -129,7 +129,7 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
                         }
                     }
                     ?>
-                </select>
+            </select>
 
                 <script>
                 $(document).ready(function() {

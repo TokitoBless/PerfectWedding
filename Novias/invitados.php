@@ -1,4 +1,5 @@
 <?php
+include_once('./validacionesUsuarios.php');
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
@@ -118,9 +119,21 @@ if (isset($_POST['updateStatus'])) {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tabla kanban</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
-                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mensajes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -130,12 +143,11 @@ if (isset($_POST['updateStatus'])) {
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
                             <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $id; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $id; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -148,7 +160,7 @@ if (isset($_POST['updateStatus'])) {
 
 <center>
 
-<form class="form-inline" action="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>" method="post">
+<form class="form-inline agregarInvitadoOcultar" action="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>" method="post">
     <div class="form-floating input-container">
         <input type="text" name="nombreCompleto" pattern="[a-zA-Z ]{2,254}" title="Solo se permiten letras"  class="form-control" id="floatingInput" placeholder="name@example.com">
         <label for="floatingInput">Nombre completo del invitado</label>
@@ -179,7 +191,7 @@ if (isset($_POST['updateStatus'])) {
                 <th>Estatus de confirmación</th>
                 <th>Última modificación por</th>
                 <th>Invitado de</th>
-                <th>Opciones</th>
+                <th class="agregarInvitadoOcultar">Opciones</th>
             </tr>
         </thead>
         <tbody>
@@ -208,7 +220,7 @@ if (isset($_POST['updateStatus'])) {
                     echo "<td>{$row['ultimaModificacion']}</td>";
                     echo "<td>{$row['invitadoDe']}</td>";
                     //Opciones de eliminar y editar
-                    echo "<td>
+                    echo "<td class='agregarInvitadoOcultar'>
                             <a href='#' onclick='confirmDelete({$row['id']})'><img src='../Imagenes/eliminar.png' alt='Eliminar' width='20' height='20'></a>
                             <a href='#' onclick='showEditInput({$row['id']})'><img src='../Imagenes/editar.png' alt='Editar' width='20' height='20'></a>
                           </td>";
@@ -282,7 +294,15 @@ function updateStatus(id) {
 
 
 
+//Ocultar para ayudantes 
+    document.addEventListener("DOMContentLoaded", function() {
+        const mostrarDiv = <?php echo json_encode($mostrarDiv); ?>; // Convierte a JSON
+        const elements = document.querySelectorAll('.agregarInvitadoOcultar');
 
+        elements.forEach(function(element) {
+            element.classList.toggle('hidden', !mostrarDiv); 
+        });
+    });
 
 </script>
 

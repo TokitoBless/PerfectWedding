@@ -136,7 +136,19 @@ if ($queryPrecios->num_rows > 0) {
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
                 <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
-                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mensajes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -563,7 +575,12 @@ if ($queryServicios->num_rows > 0) {
             .then(response => response.text()) // Recibir respuesta del servidor
             .then(data => {
                 if (data && data.trim() !== ''){
-                    alert(data); // Mostrar la respuesta del servidor
+                    if (confirm(data + "\n¿Quieres ajustar los presupuestos?")) {
+                        // Si presiona "Aceptar", redirige 
+                        window.location.href = `ajustePresupuesto.php?idBoda=${idBoda}&idUsuario=${idUsuario}&categoria=${categoria}`;
+                    } else {
+                        // Si presiona "Cancelar", solo se cierra el alert 
+                    }
                 }
             })
             .catch(error => {
@@ -608,7 +625,12 @@ if ($queryServicios->num_rows > 0) {
                     .then(response => response.text()) // Recibir respuesta del servidor
                     .then(data => {
                         if (data && data.trim() !== '') {
-                            alert(data); // Mostrar la respuesta del servidor
+                            if (confirm(data + "\n¿Quieres ajustar los presupuestos?")) {
+                                // Si presiona "Aceptar", redirige 
+                                window.location.href = `ajustePresupuesto.php?idBoda=${idBoda}&idUsuario=${idUsuario}&categoria=${categoria}`;
+                            } else {
+                                // Si presiona "Cancelar", solo se cierra el alert 
+                            }
                         }
                     })
                     .catch(error => {
