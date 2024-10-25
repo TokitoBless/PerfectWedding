@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="col-sm-9">
                     <select id="tareaPadre" name="tareaPadre" class="form-control">
                     <?php
-                        $sqlTarea = "SELECT id, titulo FROM tareas WHERE idboda = '$idBoda'";
+                        $sqlTarea = "SELECT id, titulo FROM tareas WHERE idboda = '$idBoda' AND idTarea = '0'";
                         $queryTarea = $Conexion->query($sqlTarea);
                         if ($queryTarea->num_rows > 0) {
                             echo "<option value='' disabled selected>Seleccione una opcion</option>";

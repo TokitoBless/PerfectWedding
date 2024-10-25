@@ -1,4 +1,7 @@
 <?php
+
+// Quitar checkboxes en subtarea
+//Arreglar en el select al agregar tareas sale subtareas en tareas
 include_once('./validacionesUsuarios.php');
 include_once('../Conexion/conexion.php');
 
@@ -9,6 +12,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     header('Location: panelGeneral.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
 }
+
 
 ?>
 
@@ -112,12 +116,19 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
         <span id="progressValue">0%</span>
 
         <!-- Validacion por los novios -->
+        <div id="checkboxesvalidaciones">
         <label>Aprobar:
         <input type="checkbox" name="validacion" id="validacion" class="Ocultar">
         </label>
+
         <label>Marcar como tarea completada:
         <input type="checkbox" name="checkboxcompletado" id="checkboxcompletado" class="Ocultar">
         </label>
+        </div>
+        <label id="numeroDeSubtareas">Numero Subtareas: <p id="numeroSubtareas"></p></label>
+
+        <p id="fecha" name="fecha"></p>
+        <p id="nombreEncargado" name="nombreEncargado"></p>
         <!-- Mostrar comentarios -->
         <div id="commentsSection">
             <h3>Comentarios:</h3>
@@ -205,7 +216,18 @@ function openModal(tarea, idBoda) {
     
     // Mostrar título y descripción
     document.getElementById('modalTitle').innerText = tarea.titulo;
-    document.getElementById('modalDescription').innerText = tarea.descripcion;
+    document.getElementById('modalDescription').innerText = tarea.descripcion; 
+    document.getElementById('numeroSubtareas').innerText = tarea.numeroSubtareas;
+    document.getElementById('validacion').checked = tarea.aprobado;
+    document.getElementById('checkboxcompletado').checked = tarea.completado;
+    document.getElementById('fecha').innerText = tarea.fecha;
+    document.getElementById('nombreEncargado').innerText = tarea.nombreEncargado;
+
+    if(tarea.idTarea != 0){ // si soy subtarea
+        document.getElementById('checkboxesvalidaciones').style.display = "none";
+    }else{
+        document.getElementById('checkboxesvalidaciones').style.display = "block";
+    }
 
     // Configurar el porcentaje de progreso
     const taskProgress = document.getElementById('taskProgress');
@@ -216,7 +238,7 @@ function openModal(tarea, idBoda) {
     window.idBoda = idBoda;
     taskProgress.addEventListener('input', function () {
         progressValue.innerText = `${taskProgress.value}%`;
-        actualizarEstatus(taskProgress.value, tarea.aprobado);
+        actualizarEstatus(taskProgress.value, tarea.aprobado, tarea.completado);
     });
 
     // Cargar y mostrar los comentarios
@@ -247,7 +269,7 @@ function openModal(tarea, idBoda) {
 }
 
 // Función para actualizar el estatus basado en el porcentaje
-function actualizarEstatus(porcentaje, aprobado) {
+function actualizarEstatus(porcentaje, aprobado, completado) {
     let estatus;
     if (porcentaje == 0) {
         estatus = 'Pendiente';
@@ -255,8 +277,10 @@ function actualizarEstatus(porcentaje, aprobado) {
         estatus = 'En Curso';
     } else if (porcentaje == 100 && !aprobado) {
         estatus = 'Verificación por Novios';
-    } else if (porcentaje == 100 && aprobado) {
+    } else if (porcentaje == 100 && aprobado && !completado) {
         estatus = 'Contacto con Proveedores';
+    } else if (porcentaje == 100 && aprobado && completado){
+        estatus = 'Completado';
     }
     console.log('Estatus actualizado a:', estatus);
 }
@@ -273,6 +297,7 @@ document.getElementById('saveTask').addEventListener('click', () => {
         porcentaje: nuevoProgreso,
         idTarea: window.tareaActual.id,  // Usamos la tarea almacenada globalmente
         idUsuario: window.tareaActual.idUsuario,
+        idTareaPadre:  window.tareaActual.idTarea,
         idBoda: window.idBoda, 
         validar: checkbox,
         completado: checkboxcompletado
@@ -317,10 +342,16 @@ document.querySelector('.close').addEventListener('click', () => {
 
     const rangeInput = document.getElementById('taskProgress');
     function deshabilitarCheck(){
-        const checkbox = document.getElementById('validacion');
+        const checkboxaprobado = document.getElementById('validacion');
+        const checkboxcompletado = document.getElementById('checkboxcompletado');
         const value = rangeInput.value;
-        checkbox.disabled = (value !== '100');
-        rangeInput.disabled = (value == '100');
+        const numeroSubtareas = document.getElementById('numeroSubtareas').textContent;
+        console.log(numeroSubtareas);
+        checkboxaprobado.disabled = checkboxaprobado.checked || value !== "100";
+        checkboxcompletado.disabled = (!((value == '100') &&  checkboxaprobado.checked) || checkboxcompletado.checked);
+        rangeInput.disabled = (value == '100') || numeroSubtareas > 0;
+
+
     }
 
 //Ocultar para ayudantes 
