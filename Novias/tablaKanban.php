@@ -1,7 +1,5 @@
 <?php
 
-// Quitar checkboxes en subtarea
-//Arreglar en el select al agregar tareas sale subtareas en tareas
 include_once('./validacionesUsuarios.php');
 include_once('../Conexion/conexion.php');
 
@@ -12,6 +10,155 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     header('Location: panelGeneral.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
 }
+$sqlTarea= "SELECT * from tareas where idEncargado = '$idUsuario' AND porcentaje < 100 ";
+$queryTarea = $Conexion->query($sqlTarea);
+
+if ($queryTarea->num_rows > 0) {
+    while($row = $queryTarea->fetch_assoc()) {
+        $titulo = $row['titulo'];
+        $fecha = $row['fecha'];
+        $creacionTarea = $row['creacionTarea'];
+        $porcentaje = $row['porcentaje'];
+        $encargado = $row['idEncargado'];
+        
+        $idNovia = $row['idUsuario'];
+
+        $fechaC = new DateTime($fecha);
+        $fechaCreacion = $fechaC->format('Y-m-d'); 
+        $fechaC->modify('+2 days');
+        $fecha2Dias = $fechaC->format('Y-m-d');
+
+        $fechaActual = new DateTime(); 
+        $fechaActual->modify('+ 1 week');
+        $fechaActual1Semana = $fechaActual->format('Y-m-d');
+
+        if($fecha2Dias > $creacionTarea){//Cada dos dias
+            //Enviar notificacion
+            $detallesNotificacion = "Este es un recordatorio de que la tarea " . $titulo . " tiene como fecha límite " . $fecha . "\n Por favor, asegúrate de completarla a tiempo. ";
+            $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idUsuario', 'Recordatorio de tarea', '$fechaCreacion', '$detallesNotificacion' )";    
+            $queryGuardarNotificacion = $Conexion->query($sqlGuardarNotificacion);
+
+            $sqlInvitados= "SELECT usuario, correo from usuarios where id = '$idUsuario'";
+            $queryInvitados = $Conexion->query($sqlInvitados);
+            $row = $queryInvitados->fetch_assoc();
+            $usuarioInvitado = $row['usuario'];
+            $correoInvitado = $row['correo'];
+
+            //Envio del correo
+            $nombreEmpresa = 'PerfectWedding';
+            $destino = 'dianapdz09@gmail.com'; //correo del cliente
+            $asunto = 'Recordatorio de tarea';
+
+            $contenido = '
+                <html> 
+                    <body> 
+                        <h2>¡Hola '.$usuarioInvitado.'! </h2>
+                        <p> 
+                            Este es un recordatorio de que la tarea  "' . $titulo . '" tiene como fecha límite ' . $fecha . '<br>
+                            Por favor, asegúrate de completarla a tiempo. 
+                        </p> 
+                    </body>
+                </html>
+            ';
+            //para el envío en formato HTML 
+            $headers = "MIME-Version: 1.0\r\n"; 
+            $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+            //dirección del remitente
+            $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+            mail($destino,$asunto,$contenido,$headers);
+
+        }
+        if($porcentaje == 50){//Si la tarea esta al 50% de progreso
+
+            $sqlNovia= "SELECT usuario, correo from usuarios where id = '$idNovia'";
+            $queryNovia = $Conexion->query($sqlNovia);
+            $row = $queryNovia->fetch_assoc();
+            $usuarioNovia = $row['usuario'];
+            $correoNovia = $row['correo'];
+
+            $sqlEncargado= "SELECT usuario from usuarios where id = '$encargado'";
+            $queryEncargado= $Conexion->query($sqlEncargado);
+            $row = $queryEncargado->fetch_assoc();
+            $usuarioEncargado = $row['usuario'];
+
+            //Enviar notificacion
+            $detallesNotificacion = "La tarea " . $titulo . " está ahora al 50% de progreso. \n El encargado de esta tarea es " . $usuarioEncargado . "\n Por favor, asegúrate de completarla a tiempo. ";
+            $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idNovia', 'Tarea al 50% de progreso', '$fechaCreacion', '$detallesNotificacion' )";    
+            $queryGuardarNotificacion = $Conexion->query($sqlGuardarNotificacion);
+
+            //Envio del correo
+            $nombreEmpresa = 'PerfectWedding';
+            $destino = 'dianapdz09@gmail.com'; //correo del cliente
+            $asunto = 'Tarea al 50% de progreso';
+
+            $contenido = '
+                <html> 
+                    <body> 
+                        <h2>¡Hola '.$usuarioNovia.'! </h2>
+                        <p> 
+                            La tarea  "' . $titulo . '" está ahora al 50% de progreso. <br>
+                            El encargado de esta tarea es ' . $usuarioEncargado . '. ¡Sigue adelante!"
+                        </p> 
+                    </body>
+                </html>
+            ';
+            //para el envío en formato HTML 
+            $headers = "MIME-Version: 1.0\r\n"; 
+            $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+            //dirección del remitente
+            $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+            mail($destino,$asunto,$contenido,$headers);
+        }
+        if($fechaActual1Semana >= $fecha){
+            $sqlNovia= "SELECT usuario, correo from usuarios where id = '$idNovia'";
+            $queryNovia = $Conexion->query($sqlNovia);
+            $row = $queryNovia->fetch_assoc();
+            $usuarioNovia = $row['usuario'];
+            $correoNovia = $row['correo'];
+
+            $sqlEncargado= "SELECT usuario from usuarios where id = '$encargado'";
+            $queryEncargado= $Conexion->query($sqlEncargado);
+            $row = $queryEncargado->fetch_assoc();
+            $usuarioEncargado = $row['usuario'];
+
+            //Enviar notificacion
+            $detallesNotificacion = "La tarea " . $titulo . " está ahora al 50% de progreso. \n El encargado de esta tarea es " . $usuarioEncargado . "\n\r Por favor, asegúrate de completarla a tiempo. ";
+            $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idNovia', 'Tarea cerca de la fecha límite', '$fechaCreacion', '$detallesNotificacion' )";    
+            $queryGuardarNotificacion = $Conexion->query($sqlGuardarNotificacion);
+
+            //Envio del correo
+            $nombreEmpresa = 'PerfectWedding';
+            $destino = 'dianapdz09@gmail.com'; //correo del cliente
+            $asunto = 'Tarea cerca de la fecha límite';
+
+            $contenido = '
+                <html> 
+                    <body> 
+                        <h2>¡Hola '.$usuarioNovia.'! </h2>
+                        <p> 
+                            La tarea  "' . $titulo . '" está cerca de su fecha límite. <br>
+                            La fecha límite para completar esta tarea es el ' . $fecha . '. <br>
+                            El encargado de esta tarea es ' . $usuarioEncargado . '. ¡Hazlo lo mejor que puedas!"
+                        </p> 
+                    </body>
+                </html>
+            ';
+            //para el envío en formato HTML 
+            $headers = "MIME-Version: 1.0\r\n"; 
+            $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+            //dirección del remitente
+            $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+            mail($destino,$asunto,$contenido,$headers);
+
+        }
+
+        
+    }
+}
+
 
 
 ?>
@@ -268,8 +415,10 @@ function openModal(tarea, idBoda) {
                 const commentDiv = document.createElement('div');
                 commentDiv.className = 'comment';
                 commentDiv.innerHTML = `
+                    <span>${comentario.usuario}</span>
                     <p>${comentario.comentario}</p>
                     <small>${new Date(comentario.fecha).toLocaleString()}</small>
+                    <hr>
                 `;
                 commentsList.appendChild(commentDiv);
             });
@@ -307,8 +456,8 @@ document.getElementById('saveTask').addEventListener('click', () => {
     const data = {
         comentario: nuevoComentario,
         porcentaje: nuevoProgreso,
-        idTarea: window.tareaActual.id,  // Usamos la tarea almacenada globalmente
-        idUsuario: window.tareaActual.idUsuario,
+        idTarea: window.tareaActual.id,  
+        idUsuario: <?php echo $idUsuario; ?>,
         idTareaPadre:  window.tareaActual.idTarea,
         idBoda: window.idBoda, 
         validar: checkbox,

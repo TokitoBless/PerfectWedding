@@ -1,31 +1,36 @@
 <?php
 include_once('../Conexion/conexion.php');
 
-if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])&& isset($_GET['idServicio'])) {
-    $idUsuario = $_GET['idUsuario'];
+if (isset($_GET['idTablero']) && isset($_GET['idBoda'])&&isset($_GET['idUsuario']) ) {
     $idBoda = $_GET['idBoda'];
-    $idServicio = $_GET['idServicio'];
+    $idUsuario = $_GET['idUsuario'];
+    $idTablero = $_GET['idTablero'];
 
-    //Nombre del servicio
-    $sqlServicio = "SELECT nombreServicio FROM servicios WHERE id = $idServicio";
-    $queryServicio =  $Conexion->query($sqlServicio);
-    $row = $queryServicio->fetch_assoc();
-    $nombreServicio = $row['nombreServicio'];
-    
-    $fechaC = new DateTime();
-    $fechaCreacion = $fechaC->format('Y-m-d'); 
-    $detallesNotificacion = "Un servicio ha sido compartido contigo";
+    //Nombre del tablero
+    $sqlTablero = "SELECT nombre FROM tablerospersonalizados WHERE id = $idTablero";
+    $queryTablero =  $Conexion->query($sqlTablero);
+    $row = $queryTablero->fetch_assoc();
+    $nombreTablero = $row['nombre'];
 
     if (isset($_POST['invitados'])){
         $invitados = $_POST['invitados'];
+        $fechaC = new DateTime();
+        $fechaCreacion = $fechaC->format('Y-m-d'); 
+        $detallesNotificacion = "Un tablero ha sido compartido contigo";
+
         foreach ($invitados as $invitado){
-            $sql = "INSERT INTO servicioscompartidos (idUsuario, idServicio) VALUES ('$invitado', '$idServicio')";
+            $sql = "INSERT INTO tableroscompartidos (idTablero, idUsuario) VALUES ('$idTablero', '$invitado')";
             $Conexion->query($sql);
-            $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$invitado', 'Servicio compartido', '$fechaCreacion', '$detallesNotificacion' )";    
+      
+            $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$invitado', 'Tablero compartido', '$fechaCreacion', '$detallesNotificacion' )";    
             $queryGuardarNotificacion = $Conexion->query($sqlGuardarNotificacion);
+
         }
-        header('location:panelGeneral.php?success=Servicio Compartido&idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '');
-        exit();
+        echo '<script>
+                alert("Tablero compartido con exito");
+                window.location.href = "tablerosFavoritos.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '";
+            </script>';
+            exit();
     }
 
 } else {
@@ -33,10 +38,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])&& isset($_GET['idServici
     exit();
 }
 
-
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -104,11 +106,11 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])&& isset($_GET['idServici
     </div>
 </nav>
 <br>
-<h3>Compartir servicio <?php echo htmlspecialchars($nombreServicio); ?></h3>
+<h3>Compartir tablero "<?php echo htmlspecialchars($nombreTablero); ?>"</h3>
 <br>
     
 <div class="container d-flex justify-content-center">
-  <form action="compartir.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>" method="POST" class="w-50">
+  <form action="tablerosCompartir.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idTablero=<?php echo $idTablero; ?>" method="POST" class="w-50">
 
 
     <div class="row">

@@ -5,9 +5,16 @@ $idUsuario = isset($_GET['idUsuario']) ? $_GET['idUsuario'] : '';
 $idServicio = isset($_GET['idServicio']) ? $_GET['idServicio'] : '';
 $idBoda = isset($_GET['idBoda']) ? $_GET['idBoda'] : ''; 
 
-if(isset($_POST['nombre'])&&isset($_POST['comentario'])&&isset($_POST['calificacion'])){
+$sqlUsuario = "SELECT usuario FROM usuarios where id = ?";
+$stmt = $Conexion->prepare($sqlUsuario);
+$stmt->bind_param("i", $idUsuario);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$usuario = $row['usuario'];
+
+if(isset($_POST['comentario'])&&isset($_POST['calificacion'])){
     
-    $nombre = $_POST['nombre'];
     $comentario = $_POST['comentario'];
     $calificacion = $_POST['calificacion'];
     $fecha = date('Y-m-d H:i:s');
@@ -48,7 +55,7 @@ if(isset($_POST['nombre'])&&isset($_POST['comentario'])&&isset($_POST['calificac
         <form id="reviewForm" action="escribirResena.php?idBoda=<?php echo $idBoda?>&idServicio=<?php echo $idServicio?>&idUsuario=<?php echo $idUsuario?>" method="POST">
 
             <label for="nombre">Nombre del usuario:</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($usuario); ?>" readonly>
 
             <label for="comentario">Comentario:</label>
             <textarea id="comentario" name="comentario" rows="4" required></textarea>

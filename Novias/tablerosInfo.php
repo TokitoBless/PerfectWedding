@@ -6,7 +6,8 @@ if (isset($_GET['tipo'])) {
     $idUsuario = isset($_GET['idUsuario']) ? $_GET['idUsuario'] : '';
     $idBoda = $_GET['idBoda'];
     $idTablero = isset($_GET['idTablero']) ? $_GET['idTablero'] : '';
-    
+    $nombreUsuariosTablero = "";
+    $nombreCreadorTablero = "";
     switch ($tipo) {
         case 'tablerosGuardados':
             $consulta = "SELECT * from servicios s where s.id in (
@@ -15,6 +16,24 @@ if (isset($_GET['tipo'])) {
         case 'tablerosCompartidos':
             $consulta = "SELECT * from servicios s where s.id in (
             select sg.idServicio from serviciosguardados sg where sg.idTablero = '$idTablero')";
+
+            $consultaUsuariosTablero = "SELECT u.usuario from usuarios u where u.id IN
+            (select tc.idUsuario from tableroscompartidos tc where tc.idTablero = '$idTablero')";
+            $queryConsultaUsuariosTablero = $Conexion->query($consultaUsuariosTablero);
+            if ($queryConsultaUsuariosTablero->num_rows > 0) {
+                while($row = $queryConsultaUsuariosTablero->fetch_assoc()) {
+                    $nombreUsuariosTablero = $nombreUsuariosTablero . $row["usuario"] . ", ";
+                }
+            }
+
+            $consultaCreadorTablero = "SELECT u.usuario from usuarios u where u.id IN
+            (select tp.idUsuario from tablerospersonalizados tp where tp.id = '$idTablero')";
+            $queryConsultaCreadorTablero = $Conexion->query($consultaCreadorTablero);
+            if ($queryConsultaCreadorTablero->num_rows > 0) {
+                while($row = $queryConsultaCreadorTablero->fetch_assoc()) {
+                    $nombreCreadorTablero = $row["usuario"];
+                }
+            }
             break;
         case 'serviciosCompartidos':
             $consulta = "SELECT * from servicios s where s.id in (
@@ -29,11 +48,6 @@ if (isset($_GET['tipo'])) {
     $datos = [];
     $html = "";
     
-    /*if ($resultado) {
-        while ($fila = $resultado->fetch_assoc()) {
-            $datos[] = $fila;
-        }
-    }*/
 
     if ($resultado) {
         $html = "<div class='card-container'>";
@@ -72,14 +86,15 @@ if (isset($_GET['tipo'])) {
                     <h5 class='card-title'>$nombreServicio</h5>
                 </div>
             </div>";
-        $html =  $html . "</div>";
         }
+        $html =  $html . "</div>";
     }
-
     
-    echo $html;
-
-   // echo json_encode($html);
+    //echo $html;
+    $datos[0]=$html;
+    $datos[1]=$nombreUsuariosTablero;
+    $datos[2]=$nombreCreadorTablero;
+    echo json_encode($datos);
 }
 ?>
 

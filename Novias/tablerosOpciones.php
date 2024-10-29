@@ -10,7 +10,7 @@ if (isset($_GET['tipo'])) {
             $consulta = "SELECT * FROM tablerospersonalizados where idUsuario = '$idUsuario'";
             break;
         case 'tablerosCompartidos':
-            $consulta = "SELECT tp.* FROM tablerospersonalizados tp where tp.id = (
+            $consulta = "SELECT tp.* FROM tablerospersonalizados tp where tp.id IN (
             select tc.idTablero from tableroscompartidos tc where tc.idUsuario = '$idUsuario')";
             break;
         default:

@@ -22,13 +22,56 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $titulo = $_POST['tituloTarea'];
     $fecha = $_POST['fechaTarea'];
     $prioridad = $_POST['prioridad'];
+    $fechaC = new DateTime();
+    $fechaCreacion = $fechaC->format('Y-m-d'); 
 
-    $sqlAgregar = "INSERT INTO tareas (idBoda, idUsuario, idTarea, titulo, descripcion, idEncargado, fecha, prioridad, porcentaje, estatus, aprobado) 
-                   VALUES ('$idBoda', '$idUsuario', '$tareaPadre', '$titulo', '$descripcion', '$encargado', '$fecha', '$prioridad', '0', 'Pendiente', '0')";
+    $sqlAgregar = "INSERT INTO tareas (idBoda, idUsuario, idTarea, titulo, descripcion, idEncargado, fecha, creacionTarea, prioridad, porcentaje, estatus, aprobado) 
+                   VALUES ('$idBoda', '$idUsuario', '$tareaPadre', '$titulo', '$descripcion', '$encargado', '$fecha', '$fechaCreacion', '$prioridad', '0', 'Pendiente', '0')";
 
     $queryAgregar = $Conexion->query($sqlAgregar);
 
+    //Enviar notificacion
+    $fechaC = new DateTime();
+    $fechaCreacion = $fechaC->format('Y-m-d'); 
+    $detallesNotificacion = "Tienes una nueva tarea llamada "". $titulo ."", la fecha limita para hacerla es ". $fecha ."";
+    $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$encargado', 'Tienes una nueva tarea', '$fechaCreacion', '$detallesNotificacion' )";    
+    $queryGuardarNotificacion = $Conexion->query($sqlGuardarNotificacion);
 
+    $sqlInvitados= "SELECT usuario, correo from usuarios where id = '$encargado'";
+    $queryInvitados = $Conexion->query($sqlInvitados);
+    $row = $queryInvitados->fetch_assoc();
+    $usuarioInvitado = $row['usuario'];
+    $correoInvitado = $row['correo'];
+
+    //Envio del correo
+    $nombreEmpresa = 'PerfectWedding';
+    $destino = 'dianapdz09@gmail.com'; //correo del cliente
+    $asunto = 'Tienes una nueva tarea';
+
+    $contenido = '
+        <html> 
+            <body> 
+                <h2>¡Hola '.$usuarioInvitado.'! </h2>
+                <p> 
+                    Has sido asignado a una nueva tarea llamada  "' . $titulo . '". <br>
+                    La fecha límite para completar esta tarea es '.$fecha.'. ¡Buena suerte!"
+                </p> 
+            </body>
+        </html>
+    ';
+    //para el envío en formato HTML 
+    $headers = "MIME-Version: 1.0\r\n"; 
+    $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+    //dirección del remitente
+    $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+    mail($destino,$asunto,$contenido,$headers);
+
+    echo '<script>
+        alert("Tarea creada");
+        window.location.href = "tablaKanban.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '";
+        </script>';
+        exit();
 }
 ?>
 

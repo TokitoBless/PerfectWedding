@@ -4,6 +4,18 @@ include_once('../Conexion/conexion.php');
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     $idUsuario = $_GET['idUsuario'];
     $idBoda = $_GET['idBoda'];
+
+    if (isset($_POST['nuevoTablero'])){
+        $nuevoTablero = $_POST['nuevoTablero'];
+        $sql = "INSERT INTO tablerospersonalizados (idUsuario, nombre) VALUES ('$idUsuario', '$nuevoTablero')";
+        $Conexion->query($sql);
+        echo '<script>
+        alert("Nuevo tablero creado");
+        window.location.href = "tablerosFavoritos.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '";
+        </script>';
+        exit();
+    }
+
 } else {
     header('Location: notificaciones.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
@@ -102,16 +114,82 @@ function obtenerTableros($tipo) {
 </nav>
 <br>
 <h3>Tableros Favoritos</h3>
-    <div class="contenedor-botones">
+
+<div style="display: flex; justify-content: flex-end;">
+    <form class="form-inline" action="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>" method="POST">
+        <div class="form-floating input-container">
+            <input type="text" name="nuevoTablero" pattern="[a-zA-Z ]{2,254}" title="Solo se permiten letras"  class="form-control" id="floatingInput">
+            <label for="floatingInput">Nombre del nuevo tablero</label>
+        </div>    
+        <button type="submit" class="btn btn-ch-marilla">Crear tablero</button>
+    </form>
+</div>
+<hr>
+    <div class="contenedor-botones ">
         <button class="boton" onclick="mostrarSubOpciones('tablerosGuardados')">Tableros Guardados</button>
         <button class="boton" onclick="mostrarSubOpciones('tablerosCompartidos')">Tableros Compartidos</button>
         <button class="boton" onclick="mostrarContenido('','serviciosCompartidos')">Servicios Compartidos</button>
     </div>
-    
+    <hr>
+    <div id="usuariosTablero"></div>
     <div id="contenido" class="contenido-tablero"></div>
     <div id="contenido-tablero"></div>
+    
 
+    <!-- Modal -->
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalName"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container ">
+                    <div class="row justify-content-start">
+                        <div class="col-4">
+                            <div class="carrusel-img-container">
+                                <div id="carouselExample" class="carousel slide">
+                                    <div class="carousel-inner" id="carouselImages">
+                                        <!-- Imagenes javas -->
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Anterior</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Siguiente</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <b>Descripción:</b><br> <span id="modalDescrip"></span><br>
+                            <b>Precio:</b><br> $<span id="modalPrecio"></span><br>
+                            <b>Nombre del proveedor:</b><br> <span id="modalNombreProveedor"></span><br>
+                            <b id="modalLabelSitioWeb">SitioWeb:</b><br> <span id="modalSitioWeb" ></span>
+                        </div>
+                    </div>
+                    <center>
+                        <b>Calificación:</b>
+                        <div class="star-container" id="starContainer">
+                            <!-- Calificacioncita -->
+                        </div>
+                    </center>
 
+                    <b>Reseñas: </b><span id="totalResenas"></span>
+                    <div id="commentsList"></div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-secondary" id="solicitarPresupuestoBtn" href="#" role="button">Cotización</a>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br><br>
 </body>
 </html>
 <script>
@@ -121,9 +199,13 @@ function obtenerTableros($tipo) {
                 .then(data => {
                     const tableroContainer = document.getElementById('contenido');
                     tableroContainer.innerHTML = '';
+                    tableroContainer.style.textAlign = 'right';
+                    const contenidoDiv = document.getElementById('contenido-tablero');
+                    contenidoDiv.innerHTML = '';
+                    const itemElement = document.getElementById('usuariosTablero');
+                    itemElement.innerHTML = '';
 
                     data.forEach(tablero => {
-                        console.log(tablero);
                         const tableroElement = document.createElement('div');
                         tableroElement.className = 'boton';
                         tableroElement.innerText = tablero.nombre;
@@ -135,12 +217,26 @@ function obtenerTableros($tipo) {
 
         function mostrarContenido(id, tipo) {
             fetch(`tablerosInfo.php?tipo=${tipo}&idTablero=${id}&idUsuario=<?php echo $idUsuario?>&idBoda=<?php echo $idBoda?>`)
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(data => {
-                    const contenidoDiva = document.getElementById('contenido');
-                    contenidoDiva.innerHTML = '';
+                    const tableroContainer = document.getElementById('contenido');
                     const contenidoDiv = document.getElementById('contenido-tablero');
-                    contenidoDiv.innerHTML = data; // Inserta el HTML recibido
+                    const itemElement = document.getElementById('usuariosTablero');
+                    tableroContainer.innerHTML = '';
+                    contenidoDiv.innerHTML = '';
+                    itemElement.innerHTML = '';
+                    if(id!=''){
+                        if(tipo=='tablerosCompartidos'){
+                            itemElement.style.textAlign = 'right';
+                            itemElement.innerHTML = `<p>Tablero compartido con: ${data[1]} y creado por ${data[2]}</p>`;
+                        }
+                        tableroContainer.style.textAlign = 'right';
+                        tableroContainer.innerHTML = `<br><a type="button" href="tablerosCompartir.php?idTablero=${id}&idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda?>" class="btn btn-ch-marilla">Compartir tablero</a><br>`;
+                        
+                    }
+                    
+                   
+                    contenidoDiv.innerHTML = data[0]; // Inserta el HTML recibido
 
                     if (data.length === 0) {
                         // Mensaje según la opción seleccionada si no hay resultados
@@ -150,13 +246,6 @@ function obtenerTableros($tipo) {
                                       'No se cuenta con Servicios Compartidos.';
                         contenidoDiv.innerHTML = `<p>${mensaje}</p>`;
                     } else {
-                        /*data.forEach(item => {
-                            const itemElement = document.createElement('div');
-                            itemElement.className = 'boton';
-                            itemElement.innerText = tipo.includes('tableros') ? item.nombre : item.nombreServicio;
-                            itemElement.onclick = () => cargarContenido(item, tipo);
-                            contenidoDiv.appendChild(itemElement);
-                        });*/
                     }
                 });
         }
@@ -167,3 +256,115 @@ function obtenerTableros($tipo) {
             //contenidoDiv.innerHTML = `${respuesta}`;
         }
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = document.getElementById('serviceModal');
+        modal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            console.log(id);
+            var idBoda = button.getAttribute('data-idBoda');
+            var idUsuario = button.getAttribute('data-idUsuario');
+            var images = JSON.parse(button.getAttribute('data-images'));
+            var name = button.getAttribute('data-name');
+            var descrip = button.getAttribute('data-descrip');
+            var categoria = button.getAttribute('data-categoria');
+            var precio = button.getAttribute('data-precio');
+            var calificacion = button.getAttribute('data-cali');
+            var palabraClave = button.getAttribute('data-palabraClave');
+            var nombreProveedor = button.getAttribute('data-nombreProveedor');
+            var sitioWeb = button.getAttribute('data-sitioWeb');
+
+            var carouselImages = modal.querySelector('#carouselImages');            
+            var modalName = modal.querySelector('#modalName');
+            var modalDescrip = modal.querySelector('#modalDescrip');
+            var modalPrecio = modal.querySelector('#modalPrecio');
+            var solicitarPresupuestoBtn = modal.querySelector('#solicitarPresupuestoBtn');
+            var modalNombreProveedor = modal.querySelector('#modalNombreProveedor');
+            var modalSitioWeb = modal.querySelector('#modalSitioWeb');
+            var modalLabelSitioWeb = modal.querySelector('#modalLabelSitioWeb');
+            var starContainer = modal.querySelector('#starContainer');
+            
+
+            // Limpiar el contenido anterior
+            carouselImages.innerHTML = '';
+            starContainer.innerHTML = '';
+
+            images.forEach(function (image, index) {
+                var activeClass = index === 0 ? 'active' : '';
+                var carouselItem = `
+                <div class="carousel-item ${activeClass}">
+                    <img src="${image}" class="d-block w-100" alt="Image ${index + 1}">
+                </div>`;
+                carouselImages.insertAdjacentHTML('beforeend', carouselItem);
+            });
+
+            //Crear elementos de la calificacion
+            for (var i = 1; i <= 5; i++) {
+                var starImg = document.createElement('img');
+                starImg.src = i <= calificacion ? '../Imagenes/estrella_completa.png' : '../Imagenes/estrella_vacia.png';
+                starImg.alt = 'Estrella';
+                starContainer.appendChild(starImg);
+            }
+
+
+            modalName.textContent = name;
+            modalDescrip.textContent = descrip;
+            modalPrecio.textContent = precio;
+            modalNombreProveedor.textContent = nombreProveedor;
+            solicitarPresupuestoBtn.href = `solicitarPresupuesto.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
+            
+            if (!sitioWeb || sitioWeb.trim() === "") {
+                modalSitioWeb.textContent = "No hay sitio web";
+            } else {
+                modalSitioWeb.textContent = sitioWeb;
+            }
+
+            
+            // Cargar y mostrar los comentarios
+            fetch(`mostrarResenas.php?idServicio=${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(comentarios => {
+                console.log(comentarios);
+                const commentsList = document.getElementById('commentsList');
+                const totalResenas = document.getElementById('totalResenas');
+                commentsList.innerHTML = '';
+                comentarios.forEach(comentario => {
+                    totalResenas.textContent = comentario.totalResenas;
+                    const usuarioDiv = document.createElement('div');
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+                    const starContainerResena = document.createElement('div');
+                    starContainerResena.className = 'starContainerResena';
+                    usuarioDiv.innerHTML = `
+                        <span>${comentario.usuario}</span>
+                    `;
+                    commentDiv.innerHTML = `
+                        <p>${comentario.resena}</p>
+                        <hr>
+                    `;
+
+                    
+                    usuarioDiv.appendChild(starContainerResena);
+                    usuarioDiv.appendChild(commentDiv);
+                    commentsList.appendChild(usuarioDiv);
+                    //Crear elementos de la calificacion
+                for (var i = 1; i <= 5; i++) {
+                    var starImg = document.createElement('img');
+                    starImg.src = i <= comentario.calificacion ? '../Imagenes/estrella_completa.png' : '../Imagenes/estrella_vacia.png';
+                    starImg.alt = 'Estrella';
+                    starContainerResena.appendChild(starImg);
+                }
+                });
+
+            });
+
+        });
+    });
+</script>
