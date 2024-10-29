@@ -260,3 +260,27 @@ resize: both;
 .hidden {
     display: none; /* Clase para ocultar */
 }
+/*Tableros favoritos*/
+.boton {
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: none;
+    background-color: #e369b0;
+    color: white;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+.boton:hover {
+    background-color: #a95084;
+}
+.contenedor-botones {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+.contenido-tablero {
+    margin-top: 20px;
+}

@@ -6,43 +6,28 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])&& isset($_GET['idServici
     $idBoda = $_GET['idBoda'];
     $idServicio = $_GET['idServicio'];
 
-    //Fecha de la boda
-    $sqlBoda = "SELECT fechaBoda FROM bodas WHERE idEvento = $idBoda";
-    $queryBoda =  $Conexion->query($sqlBoda);
-    $row = $queryBoda->fetch_assoc();
-    $fecha = $row['fechaBoda'];
-    $fechaBoda = date('Y-m-d', strtotime($fecha));
-
     //Nombre del servicio
     $sqlServicio = "SELECT nombreServicio FROM servicios WHERE id = $idServicio";
     $queryServicio =  $Conexion->query($sqlServicio);
     $row = $queryServicio->fetch_assoc();
     $nombreServicio = $row['nombreServicio'];
 
+    if (isset($_POST['invitados'])){
+        $invitados = $_POST['invitados'];
+        foreach ($invitados as $invitado){
+            $sql = "INSERT INTO servicioscompartidos (idUsuario, idServicio) VALUES ('$invitado', '$idServicio')";
+            $Conexion->query($sql);
+            header('location:panelGeneral.php?success=Servicio Compartido&idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '');
+            exit();
+        }
+    }
+
 } else {
     header('Location: compartir.php?error="No se proporcionó IDs"');
     exit();
 }
 
-if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
-  function validar($data){
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-  }
-    $detalles = validar($_POST['detalles']);
-    
-   
-    $sqlAgregar = "INSERT INTO cotizaciones (idEvento, idUsuario, idServicio, detalles) VALUES ('$idBoda', '$idUsuario', '$idServicio', '$detalles')";
-    $queryAgregar = $Conexion->query($sqlAgregar);
 
-    if ($queryAgregar) {
-        echo "<script>alert('Cotizacion enviada, porfavor espera la respuesta del proveedor'); window.location='panelGeneral.php?idUsuario=$idUsuario&idBoda=$idBoda';</script>";
-    } else {
-        echo "Error al guardar la solicitud: " . $Conexion->error;
-    }
-}
 ?>
 
 
@@ -79,7 +64,19 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
                 <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
-                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mensajes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -134,7 +131,7 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
                 <script>
                 $(document).ready(function() {
                     $('#invitados').select2({
-                        placeholder: "Selecciona los invitados",
+                        placeholder: "Selecciona con quien compartir",
                         allowClear: true,
                     });
                 });

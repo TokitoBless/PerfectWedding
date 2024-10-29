@@ -1,17 +1,10 @@
 <?php
 include_once('../Conexion/conexion.php');
 
-if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])&& isset($_GET['idServicio'])) {
+if (isset($_GET['idUsuario']) && isset($_GET['idBoda']) && isset($_GET['idServicio'])) {
     $idUsuario = $_GET['idUsuario'];
     $idBoda = $_GET['idBoda'];
     $idServicio = $_GET['idServicio'];
-
-    //Fecha de la boda
-    $sqlBoda = "SELECT fechaBoda FROM bodas WHERE idEvento = $idBoda";
-    $queryBoda =  $Conexion->query($sqlBoda);
-    $row = $queryBoda->fetch_assoc();
-    $fecha = $row['fechaBoda'];
-    $fechaBoda = date('Y-m-d', strtotime($fecha));
 
     //Nombre del servicio
     $sqlServicio = "SELECT nombreServicio FROM servicios WHERE id = $idServicio";
@@ -19,35 +12,31 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])&& isset($_GET['idServici
     $row = $queryServicio->fetch_assoc();
     $nombreServicio = $row['nombreServicio'];
 
+    if (isset($_POST['nuevoTablero'])){
+        $nuevoTablero = $_POST['nuevoTablero'];
+        $sql = "INSERT INTO tablerospersonalizados (idUsuario, nombre) VALUES ('$idUsuario', '$nuevoTablero')";
+        $Conexion->query($sql);
+        header('location:guardarServicioCard.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '&idServicio=' . $idServicio . '');
+        exit();
+    }
+    if (isset($_POST['tableros'])){
+        $tableros = $_POST['tableros'];
+        foreach ($tableros as $tablero){
+            $sql = "INSERT INTO serviciosguardados (idUsuario, idBoda, idTablero, idServicio) VALUES ('$idUsuario', '$idBoda', '$tablero', '$idServicio')";
+            $Conexion->query($sql);
+            header('location:panelGeneral.php?success=Servicio Compartido&idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '');
+            exit();
+        }
+    }
+
+
 } else {
-    header('Location: solicitarPresupuesto.php?error="No se proporcionó IDs"');
+    header('Location: guardarServicioCard.php?error="No se proporcionó IDs"');
     exit();
 }
 
-if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
-  function validar($data){
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-  }
-    $detalles = validar($_POST['detalles']);
-    $fecha = date("Y-m-d H:i:s");
-   
-    $sqlAgregar = "INSERT INTO mensajes (idBoda, idUsuario, idServicio, remitente, mensaje, fecha) VALUES ('$idBoda', '$idUsuario', '$idServicio', 'i', '$detalles', '$fecha')";
-    $queryAgregar = $Conexion->query($sqlAgregar);
-    $sqlAgregarCotizacion = "INSERT INTO cotizaciones (idEvento, idUsuario, idServicio, detalles) VALUES ('$idBoda', '$idUsuario', '$idServicio', '$detalles')";
-    $Conexion->query($sqlAgregarCotizacion);
 
-    if ($queryAgregar) {
-        echo "<script>alert('Cotizacion enviada, porfavor espera la respuesta del proveedor'); window.location='panelGeneral.php?idUsuario=$idUsuario&idBoda=$idBoda';</script>";
-    } else {
-        echo "Error al guardar la solicitud: " . $Conexion->error;
-    }
-}
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,7 +51,7 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <title>Solicitar cotización</title>
+    <title>Guardar servicio</title>
     
 </head>
 <body>
@@ -115,23 +104,48 @@ if (isset($_POST['fechaBoda']) && isset($_POST['detalles'])) {
     </div>
 </nav>
 <br>
-<h3>Solicitar cotización del servicio <?php echo htmlspecialchars($nombreServicio); ?></h3>
+<h3>Guardar servicio <?php echo htmlspecialchars($nombreServicio); ?></h3>
 <br>
+<form class="form-inline" action="guardarServicioCard.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>" method="POST">
+    <div class="form-floating input-container">
+        <input type="text" name="nuevoTablero" pattern="[a-zA-Z ]{2,254}" title="Solo se permiten letras"  class="form-control" id="floatingInput">
+        <label for="floatingInput">Nombre del nuevo tablero</label>
+    </div>    
+    <button type="submit" class="btn btn-lila">Crear tablero</button>
+</form>
     
 <div class="container d-flex justify-content-center">
-  <form action="solicitarPresupuesto.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>" method="POST" class="w-50">
-
+  <form action="guardarServicioCard.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>" method="POST" class="w-50">
 
     <div class="row">
-      <div class="col-12 text-center">
-        <label for="fechaBoda">Fecha de  la boda</label>
-        <input type="text" id="fechaBoda" name="fechaBoda" class="form-control" value="<?php echo htmlspecialchars($fechaBoda); ?>" readonly>
-        <br><br>
-        <label>Detalles de la solicitud</label>
-        <textarea id="detalles" name="detalles" class="form-control" required></textarea>
-        <br>
-        <button type="submit" class="btn btn-rosa">Guardar</button>
-      </div>
+        <div class="col-12 text-center">
+            <label>Nombre Tablero</label>
+            <br><br>
+            <select id="tableros" name="tableros[]" class="form-control" multiple="multiple" required>
+                    <?php
+                    // Agarrar los tableros
+                    $sqltableros = "SELECT * FROM tablerospersonalizados WHERE idUsuario = '$idUsuario'";
+                    $querytableros = $Conexion->query($sqltableros);
+
+                    if ($querytableros->num_rows > 0) {
+                        while($row = $querytableros->fetch_assoc()) {
+                            echo "<option value='".$row['id']."'>".$row['nombre']."</option>";
+                        }
+                    }
+                    ?>
+            </select>
+
+                <script>
+                $(document).ready(function() {
+                    $('#tableros').select2({
+                        placeholder: "Selecciona en que tablero guardar",
+                        allowClear: true,
+                    });
+                });
+                </script> 
+            <br><br>
+            <button type="submit" class="btn btn-rosa">Guardar</button>
+        </div>
     </div>
   </form>
 </div>

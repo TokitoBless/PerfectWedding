@@ -197,9 +197,8 @@ $mesesEspanol = [
     </a>
 </div>
 
-
 <table>
-    <thead>
+    <thead id="tabla-calendario">
         <tr>
             <th>Lunes</th>
             <th>Martes</th>
@@ -242,10 +241,10 @@ $mesesEspanol = [
 
 <script>
     const calendarioData = <?php echo json_encode($calendario); ?>;
-
+    
     document.addEventListener("DOMContentLoaded", function () {
         const calendario = document.getElementById("cuerpo-calendario");
-
+        if(calendarioData.length!=0){
         // Corregir desfase de fechas
         function corregirDesfaseFecha(fechaString) {
             const fecha = new Date(fechaString + 'T00:00:00');
@@ -345,6 +344,20 @@ $mesesEspanol = [
                 modalTemasLabel.style.display = 'inline-block';
             }
         });
+        
+        }
+        else{
+            document.getElementById('tabla-calendario').style.display = "none";
+            var nuevoEncabezado = document.createElement("h3");
+
+            // Establece el texto del h1
+            nuevoEncabezado.textContent = "No hay eventos este mes";
+
+            // Añade el h1 al elemento calendario
+            calendario.appendChild(nuevoEncabezado);
+
+        }
+        
     });
 </script>
 

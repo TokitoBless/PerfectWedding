@@ -442,8 +442,8 @@ if ($queryServicios->num_rows > 0) {
                     <div class="like-container" id="likeContainer">
                         <!-- Aquí se insertará la imagen del like -->
                     </div>
-                    <a  href="compartir.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>"><img src="../Imagenes/compartir.png" alt="Compartir" width="30" height="30"></a>
-                    <a  href="guardar.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&idServicio=<?php echo $idServicio; ?>"><img src="../Imagenes/guardar.png" alt="Guardar" width="30" height="30"></a>
+                    <a id="compartirServicio" href="#"><img src="../Imagenes/compartir.png" alt="Compartir" width="30" height="30"></a>
+                    <a id="guardarServicio" href="#"><img src="../Imagenes/guardar.png" alt="Guardar" width="30" height="30"></a>
                 </div>
                 <div class="container ">
                     <div class="row justify-content-start">
@@ -470,14 +470,16 @@ if ($queryServicios->num_rows > 0) {
                             <b>Nombre del proveedor:</b><br> <span id="modalNombreProveedor"></span><br>
                             <b id="modalLabelSitioWeb">SitioWeb:</b><br> <span id="modalSitioWeb" ></span>
                         </div>
-
                     </div>
                     <center>
-                        <label>Calificación:</label>
+                        <b>Calificación:</b>
                         <div class="star-container" id="starContainer">
                             <!-- Calificacioncita -->
                         </div>
                     </center>
+
+                    <b>Reseñas: </b><span id="totalResenas"></span>
+                    <div id="commentsList"></div>
                 </div>
                 
             </div>
@@ -516,6 +518,8 @@ if ($queryServicios->num_rows > 0) {
             var modalLabelSitioWeb = modal.querySelector('#modalLabelSitioWeb');
             var starContainer = modal.querySelector('#starContainer');
             var likeContainer = document.querySelector('#likeContainer');
+            var guardarServicio = document.querySelector('#guardarServicio');
+            var compartirServicio = document.querySelector('#compartirServicio');
             
 
             // Limpiar el contenido anterior
@@ -553,7 +557,9 @@ if ($queryServicios->num_rows > 0) {
             }
 
             solicitarPresupuestoBtn.href = `solicitarPresupuesto.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
-            
+            compartirServicio.href = `compartir.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
+            guardarServicio.href = `guardarServicioCard.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
+
             // Enviar datos al servidor
             const data = {
                 idServicio: id,
@@ -639,6 +645,48 @@ if ($queryServicios->num_rows > 0) {
                 }
             });
 
+            // Cargar y mostrar los comentarios
+            fetch(`mostrarResenas.php?idServicio=${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(comentarios => {
+                console.log(comentarios);
+                const commentsList = document.getElementById('commentsList');
+                const totalResenas = document.getElementById('totalResenas');
+                commentsList.innerHTML = '';
+                comentarios.forEach(comentario => {
+                    totalResenas.textContent = comentario.totalResenas;
+                    const usuarioDiv = document.createElement('div');
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+                    const starContainerResena = document.createElement('div');
+                    starContainerResena.className = 'starContainerResena';
+                    usuarioDiv.innerHTML = `
+                        <span>${comentario.usuario}</span>
+                    `;
+                    commentDiv.innerHTML = `
+                        <p>${comentario.resena}</p>
+                        <hr>
+                    `;
+
+                    
+                    usuarioDiv.appendChild(starContainerResena);
+                    usuarioDiv.appendChild(commentDiv);
+                    commentsList.appendChild(usuarioDiv);
+                    //Crear elementos de la calificacion
+                for (var i = 1; i <= 5; i++) {
+                    var starImg = document.createElement('img');
+                    starImg.src = i <= comentario.calificacion ? '../Imagenes/estrella_completa.png' : '../Imagenes/estrella_vacia.png';
+                    starImg.alt = 'Estrella';
+                    starContainerResena.appendChild(starImg);
+                }
+                });
+
+            });
 
         });
     });

@@ -37,6 +37,40 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
     $sqlAgregar = "INSERT INTO reuniones (idEvento, nombreReunion, temas, fecha, hora, invitados, link) VALUES ('$idBoda', '$nombreReunion', '$temas', '$fechaReunion', '$horaReunion', '$invitados_serializados', '$linkZoom')";
     $queryAgregar = $Conexion->query($sqlAgregar);
 
+    foreach ($invitados as $invitado) {
+        
+      $sqlInvitados= "SELECT usuario, correo from usuarios where id = '$invitado'";
+      $queryInvitados = $Conexion->query($sqlInvitados);
+      $row = $queryInvitados->fetch_assoc();
+      $usuarioInvitado = $row['usuario'];
+      $correoInvitado = $row['correo'];
+
+      //Envio del correo
+      $nombreEmpresa = 'PerfectWedding';
+      $destino = 'dianapdz09@gmail.com'; //correo del cliente
+      $asunto = ' Fuiste invitado a una nueva reunión ';
+  
+      $contenido = '
+          <html> 
+              <body> 
+                  <h2>¡Hola '.$usuarioInvitado.'! </h2>
+                  <p> 
+                      Has sido invitado a la reunión ' . $nombreEvento . '. <br>
+                      La fecha y hora de la reunión es '.$fechaReunion.' a las '.$horaReunion.'.
+                  </p> 
+              </body>
+          </html>
+      ';
+      //para el envío en formato HTML 
+      $headers = "MIME-Version: 1.0\r\n"; 
+      $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+      //dirección del remitente
+      $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+      mail($destino,$asunto,$contenido,$headers);
+
+    }
+
     if ($queryAgregar) {
         header('Location: calendario.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '&success=Reunión guardada correctamente');
         exit();

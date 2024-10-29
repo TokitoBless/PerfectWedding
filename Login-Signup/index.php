@@ -1,3 +1,62 @@
+<?php
+include_once('../Conexion/conexion.php');
+
+  $sqlVerificarFecha = "SELECT * FROM bodas";
+  $queryVeriFecha = $Conexion->query($sqlVerificarFecha);
+
+  while ($row = $queryVeriFecha->fetch_assoc()) {
+    
+    $fechaBoda = new DateTime($row['fechaBoda']);
+    $fechaActual = new DateTime();
+    $fechaBoda->modify('+7 days');
+
+    if ($fechaBoda < $fechaActual) {
+      $idBoda = $row['idEvento'];
+      $idUsuario = $row['usuario'];
+      
+      $fechaC = new DateTime();
+      $fechaCreacion = $fechaC->format('Y-m-d'); 
+
+      $detallesNotificacion = "Gracias por utilizar Perfect Wedding, ¡¡Queremos saber tu opinion!!\nPor favor ingresa a tu correo para acceder al link";
+      //La fecha ya paso
+      $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idUsuario', 'Nuevo evento', '$fechaCreacion', '$detallesNotificacion' )";    
+      $queryGuardarNotificacion = $Conexion->query($sqlGuardarNotificacion);
+
+      $sqlUsuario= "SELECT usuario, correo from usuarios where id = '$idUsuario'";
+      $queryUsuario = $Conexion->query($sqlUsuario);
+      $row = $queryUsuario->fetch_assoc();
+      $usuario = $row['usuario'];
+      $correo = $row['correo'];
+
+      //Envio del correo
+      $nombreEmpresa = 'PerfectWedding';
+      $destino = 'dianapdz09@gmail.com'; //correo del cliente
+      $asunto = 'Deja tu reseña sobre los servicios seleccionados';
+  
+      $contenido = '
+          <html> 
+              <body> 
+                  <h2>¡Hola '.$usuario.'! </h2>
+                  <p> 
+                      Gracias por utilizar Perfect Wedding, ¡¡Queremos saber tu opinion!! <br>
+                      Ingresa al siguiente link para dirigirte a la lista de reseñas <br>
+                      http://localhost/PROYECTO/Novias/listaResenas.php?idBoda='. base64_encode($idBoda) .'&idUsuario='. base64_encode($idUsuario) .'
+                  </p> 
+              </body>
+          </html>
+      ';
+      //para el envío en formato HTML 
+      $headers = "MIME-Version: 1.0\r\n"; 
+      $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+      //dirección del remitente
+      $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+      mail($destino,$asunto,$contenido,$headers);
+    }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

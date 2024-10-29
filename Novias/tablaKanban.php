@@ -42,7 +42,19 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
                 <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
                 <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
                 <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
-                <a class="nav-item nav-link" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mensajes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -66,7 +78,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
 <br><h3>Tabla kanban</h3>
 <div class="agregarInvitadoOcultar">
     <div style="text-align: right; margin-top: 20px; padding-right: 10px; ">
-        <a class="btn btn-rosa" type="submit" href="agregarTareas.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Agregar tarea</a>
+        <a class="btn btn-morado" type="submit" href="agregarTareas.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Agregar tarea</a>
     </div>
 </div>
 
@@ -137,7 +149,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
         </div>
 
         <!-- Botón para guardar cambios -->
-        <button id="saveTask">Guardar cambios</button>
+        <button id="saveTask" class="btn btn-rosa">Guardar cambios</button>
     </div>
     </div>
 

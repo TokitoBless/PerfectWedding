@@ -160,6 +160,13 @@ p {
     align-items: center;
     margin-left: 150px;
 }
+.starContainerResena {
+    display: flex;
+}
+.starContainerResena img {
+    width: 15px;
+    height: 15px;
+}
 
 .star-container img {
     width: 30px;

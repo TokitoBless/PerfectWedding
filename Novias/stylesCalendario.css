@@ -140,3 +140,8 @@ th{
     text-align: center;
     margin: 10px 0;
 }
+
+#modalDescripcion, #modalTemas{
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+}

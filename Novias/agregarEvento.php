@@ -40,9 +40,43 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
     $queryAgregar = $Conexion->query($sqlAgregar);
 
     $detallesNotificacion = "Has sido invitdo al evento ". $nombreEvento .". La fecha y hora del evento es ". $fecha ." a las ". $hora .".";
-    $fecha = new DateTime();
-    $fechaCreacion = $fecha->format('Y-m-d'); 
+    $fechaC = new DateTime();
+    $fechaCreacion = $fechaC->format('Y-m-d'); 
 
+    foreach ($invitados as $invitado) {
+        
+        $sqlInvitados= "SELECT usuario, correo from usuarios where id = '$invitado'";
+        $queryInvitados = $Conexion->query($sqlInvitados);
+        $row = $queryInvitados->fetch_assoc();
+        $usuarioInvitado = $row['usuario'];
+        $correoInvitado = $row['correo'];
+
+        //Envio del correo
+        $nombreEmpresa = 'PerfectWedding';
+        $destino = 'dianapdz09@gmail.com'; //correo del cliente
+        $asunto = ' Fuiste invitado a un evento';
+    
+        $contenido = '
+            <html> 
+                <body> 
+                    <h2>¡Hola '.$usuarioInvitado.'! </h2>
+                    <p> 
+                        Has sido invitado al evento ' . $nombreEvento . '. <br>
+                        La fecha y hora del evento es '.$fecha.' a las '.$hora.'.
+                    </p> 
+                </body>
+            </html>
+        ';
+        //para el envío en formato HTML 
+        $headers = "MIME-Version: 1.0\r\n"; 
+        $headers .= "Content-type: text/html; charset=UTF8\r\n"; 
+
+        //dirección del remitente
+        $headers .= "FROM: $nombreEmpresa <$destino>\r\n";
+        mail($destino,$asunto,$contenido,$headers);
+
+    }
+    
     if ($queryAgregar) {
         $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idUsuario', 'Nuevo evento', '$fechaCreacion', '$detallesNotificacion' )";    
         $queryGuardarElementoNotificacion = $Conexion->query($sqlGuardarNotificacion);
@@ -51,6 +85,10 @@ if (isset($_POST['nombreEvento']) && isset($_POST['descripcion']) && isset($_POS
     } else {
         echo "Error al guardar el evento: " . $Conexion->error;
     }
+
+    
+    
+
 }
 ?>
 
