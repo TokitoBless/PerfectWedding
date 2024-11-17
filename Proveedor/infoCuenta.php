@@ -2,6 +2,9 @@
 session_start();
 include_once('../Conexion/conexion.php');
 
+$idEncriptado = $_GET['id'];
+$id = base64_decode($idEncriptado);
+
 if (isset($_POST['apellidoPaterno']) && isset($_POST['apellidoMaterno']) && isset($_POST['nombre']) && isset($_POST['nombreEmpresa']) && isset($_POST['ciudad']) && isset($_POST['estado']) && isset($_POST['telefono'])) {
     function validar($data){
         $data = trim($data);
@@ -24,17 +27,17 @@ if (isset($_POST['apellidoPaterno']) && isset($_POST['apellidoMaterno']) && isse
     $queryVeriEmpresa = $Conexion->query($sqlVerificarEmpresa);
 
     if(mysqli_num_rows($queryVeriEmpresa) > 0){
-        header('location:infoCuenta.php?error="El proveedor ya existe"');
-        exit();
+        echo '<script language="javascript">alert("Esta empresa ya esta registrada con nosotros por favor, ingresa otra");</script>';
     }else{
-        $sqlIngresarProveedor = "INSERT INTO proveedores (apellidoPaterno, apellidoMaterno, nombre, nombreEmpresa, ciudad, estado, telefono, sitioWeb, calificacion) VALUES ('$ApellidoPaterno', '$ApellidoMaterno', '$Nombre', '$NombreEmpresa', '$Ciudad', '$Estado', '$Telefono', '$SitioWeb', '$Calificacion')";
+        $sqlIngresarProveedor = "INSERT INTO proveedores (idUsuario, apellidoPaterno, apellidoMaterno, nombre, nombreEmpresa, ciudad, estado, telefono, sitioWeb, calificacion) VALUES ('$id', '$ApellidoPaterno', '$ApellidoMaterno', '$Nombre', '$NombreEmpresa', '$Ciudad', '$Estado', '$Telefono', '$SitioWeb', '$Calificacion')";
         $queryIngresarProv = $Conexion->query($sqlIngresarProveedor);
 
         $sqlId = "SELECT MAX(id) AS max_id FROM proveedores";
         $queryId = $Conexion->query($sqlId);
         
         $row = mysqli_fetch_row($queryId);
-        $max_id = $row[0];
+        $max_idDesencriptado = $row[0];
+        $max_id = base64_encode($max_idDesencriptado);
 
         if ($queryIngresarProv) {
             header('location:panelServicios.php?success=Proveedor creado&id=' . $max_id . '');
@@ -70,7 +73,7 @@ if (isset($_POST['apellidoPaterno']) && isset($_POST['apellidoMaterno']) && isse
 <br>
 <h3>Informacion de cuenta</h3>
 <h6>Nombre del representante</h6>
-<form class="form-container" action = "infoCuenta.php" method = "POST">
+<form class="form-container" action = "infoCuenta.php?id=<?php echo $idEncriptado?>" method = "POST">
   <div class="row">
       <div class="column">
           <label for="apellido_paterno">Apellido Paterno:</label>

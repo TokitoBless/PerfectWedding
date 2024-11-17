@@ -27,13 +27,19 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
     $fecha = new DateTime();
     $FechaRegistro = $fecha->format('Y-m-d H:i:s'); 
 
-    $sqlVerificarUsuario = "SELECT * FROM usuarios WHERE correo = '$Correo'";
-    $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
+    $sqlVerificarCorreo = "SELECT * FROM usuarios WHERE correo = '$Correo'";
+    $queryVeriCorreo = $Conexion->query($sqlVerificarCorreo);
 
+    $sqlVerificarUsuario = "SELECT usuario FROM usuarios WHERE usuario = '$Usuario'";
+    $queryVeriUsuario = $Conexion->query($sqlVerificarUsuario);
     if(mysqli_num_rows($queryVeriUsuario) > 0){
-        header('location:signup.php?error="El correo ya esta siendo utilizado"');
-        exit();
+        $Usuario = $Nombre . $ApePaterno . $ApeMaterno[0] . $ApeMaterno[1];
+    }
+
+    if(mysqli_num_rows($queryVeriCorreo) > 0){
+        echo '<script language="javascript">alert("El correo ya esta siendo utilizado, por favor ingrese otro");</script>';
     }else {
+        
         $sqlIngresarUsuario = "INSERT INTO usuarios (tipoUsuario, usuario, nombre, apellidoPaterno, apellidoMaterno, correo, contraseña, codigo, estatus, fechaRegistro) VALUES ('$TipoUsuario', '$Usuario', '$Nombre', '$ApePaterno', '$ApeMaterno', '$Correo', '$ContraseñaHash', '$CodigoConfirmacion', '$Estatus', '$FechaRegistro')";
         $queryIngresarUsu = $Conexion->query($sqlIngresarUsuario);
 
@@ -41,7 +47,8 @@ if (isset($_POST['Nombre']) && isset($_POST['ApePaterno']) && isset($_POST['ApeM
         $queryId = $Conexion->query($sqlId);
         
         $row = mysqli_fetch_row($queryId);
-        $max_id = $row[0];
+        $max_idSinEncriptar = $row[0];
+        $max_id = base64_encode($max_idSinEncriptar);
 
         $nombreEmpresa = 'PerfectWedding';
         $destino = 'dianapdz09@gmail.com'; //correo del cliente

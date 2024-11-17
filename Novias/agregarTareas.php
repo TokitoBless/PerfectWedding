@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //Enviar notificacion
     $fechaC = new DateTime();
     $fechaCreacion = $fechaC->format('Y-m-d'); 
-    $detallesNotificacion = "Tienes una nueva tarea llamada "". $titulo ."", la fecha limita para hacerla es ". $fecha ."";
+    $detallesNotificacion = "Tienes una nueva tarea llamada ". $titulo .", la fecha limita para hacerla es ". $fecha ."";
     $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$encargado', 'Tienes una nueva tarea', '$fechaCreacion', '$detallesNotificacion' )";    
     $queryGuardarNotificacion = $Conexion->query($sqlGuardarNotificacion);
 

@@ -23,7 +23,7 @@ if(isset($_POST['usuarioBoda'])){
       $filaBoda = $queryVeriBoda->fetch_assoc();
       $idBoda = $filaBoda['idEvento'];//sacar el id de la boda
 
-      echo '<script language="javascript">alert("Suerte ayudando!!!");window.location.href = "panelTarea.php&idUsuario=' . $id . '&idBoda=' . $idBoda . '";</script>';
+      echo '<script language="javascript">alert("Suerte ayudando!!!");window.location.href = "panelGeneral.php?idUsuario=' . $id . '&idBoda=' . $idBoda . '";</script>';
     }else {
       // No hay ninguna boda con ese usuario como encargado
       echo '<script language="javascript">alert("No hay ninguna boda con ese usuario como encargado");</script>';

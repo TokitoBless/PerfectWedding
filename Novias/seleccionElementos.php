@@ -68,7 +68,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
             <!-- Dividimos en categorías -->
             <div id="seleccionados-novia"><h5>Novia</h5></div>
             <div id="seleccionados-novio"><h5>Novio</h5></div>
-            <div id="seleccionados-lugar"><h5>Lugar</h5></div>
+            <div id="seleccionados-lugar"><h5>Evento</h5></div>
             <div id="seleccionados-damas"><h5>Damas de Honor</h5></div>
             <div id="seleccionados-invitados"><h5>Invitados</h5></div>
         </div>
@@ -114,7 +114,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
                  <!-- Lugar -->
                 <div class="col">
                     <div style=" padding-left: 100px;">
-                        <h5>Lugar</h5>
+                        <h5>Evento</h5>
                     </div>
 
                     <div class="checkbox-list lugar">

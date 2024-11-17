@@ -1,12 +1,14 @@
 <?php
 include_once('../Conexion/conexion.php');
+$idSinEncriptar = $_GET['id'];
+$id = base64_decode($idSinEncriptar);
 
 if (isset($_POST['UsuarioNovia'])) {
     $UsuarioNovia = $_POST['UsuarioNovia'];
+    
     //agarrar idUsuario
     $sqlIdUsuario = "SELECT id FROM usuarios WHERE usuario = '$UsuarioNovia'";
-    $queryIdUsuario = $Conexion->query($sqlIdUsuario);
-
+    $queryIdUsuario = $Conexion->query($sqlIdUsuario);//id novia
     if(mysqli_num_rows($queryIdUsuario) > 0)
     {
       $row = mysqli_fetch_row($queryIdUsuario);
@@ -18,11 +20,12 @@ if (isset($_POST['UsuarioNovia'])) {
 
       if(mysqli_num_rows($queryUsuario) > 0){
         $row = mysqli_fetch_row($queryUsuario);
-        $idEvento = $row[0];
-        $sqlIngresarAyudante = "INSERT INTO ayudantes (idEvento, idUsuario) VALUES ('$idEvento', '$idUsuario')";
+        $idEventoSinEncriptar = $row[0];
+        $idEvento = base64_encode($idEventoSinEncriptar);
+        $sqlIngresarAyudante = "INSERT INTO ayudantes (idEvento, idUsuario) VALUES ('$idEventoSinEncriptar', '$id')";
         $queryIngresarAyudante = $Conexion->query($sqlIngresarAyudante);
         echo '<script language="javascript">alert("Bienvenido");</script>';
-        //header("Location: .php?idUsuario=$idUsuario&idBoda=$idBoda");
+        header("Location: ../Novias/panelGeneral.php?idUsuario=$id&idBoda=$idEvento");
         exit();
       }else {
         echo '<script language="javascript">alert("El usuario es incorrecto");</script>';
@@ -60,7 +63,7 @@ if (isset($_POST['UsuarioNovia'])) {
   <div class="card-body">
     <h5 class="card-title">Ingrese el usuario de la novia</h5>
     <p class="card-text">La novia o el novio que creo la boda a la que desea ayudar le debe de proporsionar su nombre de usuario</p>
-    <form action="infoAyudante.php" method="post">
+    <form action="infoAyudante.php?id=<?php echo base64_encode($id)?>" method="post">
         <input type="text" name = "UsuarioNovia" placeholder="Usuario de novia/o" required style="width: 400px; padding: 5px; ">
         <br><br>
         <button class="btn btn-dark" type="submit">Ingresar</button>

@@ -2,15 +2,20 @@
 include_once('../Conexion/conexion.php');
 
 $ind = isset($_GET['ind']) ? strtolower($_GET['ind']) : '';
-$idUsuario = isset($_GET['idUsuario']) ? $_GET['idUsuario'] : '';
-$idServicio = isset($_GET['idServicio']) ? $_GET['idServicio'] : '';
-$idBoda = isset($_GET['idBoda']) ? $_GET['idBoda'] : ''; 
+$idUsuarioEncriptado = isset($_GET['idUsuario']) ? $_GET['idUsuario'] : '';
+$idUsuario = base64_decode($idUsuarioEncriptado);
+$idServicioEncriptado = isset($_GET['idServicio']) ? $_GET['idServicio'] : '';
+$idServicio = base64_decode($idServicioEncriptado);
+$idBodaEncriptado = isset($_GET['idBoda']) ? $_GET['idBoda'] : ''; 
+$idBoda = base64_decode($idBodaEncriptado);
+$idProveedorEncriptado = isset($_GET['idProveedor']) ? $_GET['idProveedor'] : '';
+$idProveedor = base64_decode($idProveedorEncriptado);
 
 if ($idUsuario) {
     if($ind == 'i'){
         $sqlNombre = "SELECT p.nombreEmpresa AS nombre from servicios s
         join proveedores p on p.id = s.proveedor
-        where s.id = $idUsuario";
+        where s.id = $idServicio";
     }else{
         $sqlNombre = "SELECT CONCAT(nombre, ' ', apellidoPaterno, ' ', apellidoMaterno) AS nombre from usuarios
         where id = $idUsuario";
@@ -35,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['mensaje'])) {
     $stmtInsert->execute();
 
     // Refrescar la página para mostrar el nuevo mensaje
-    header("Location: conversaciones.php?idUsuario=" . urlencode($idUsuario)."&idServicio=".urlencode($idServicio)  . "&idBoda=" . urlencode($idBoda) . "&ind=". urlencode($ind));
+    header("Location: conversaciones.php?idUsuario=" . $idUsuario."&idServicio=".base64_encode($idServicio)  . "&idBoda=" . base64_encode($idBoda) . "&ind=". urlencode($ind) . "&idProveedor=" . base64_encode($idProveedor));
     exit();
 }
 ?>
@@ -112,9 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['mensaje'])) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="../Proveedor/panelServicios.php?id=<?php echo $idUsuario; ?>">Servicios</a>
-                <a class="nav-item nav-link" href="../Proveedor/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&ind=p">Conversaciones</a>
-                <a class="navbar-brand" href="../Proveedor/infoPerfil.php?id=<?php echo $idUsuario; ?>">
+                <a class="nav-item nav-link" href="../Proveedor/panelServicios.php?id=<?php echo $idProveedorEncriptado; ?>">Servicios</a>
+                <a class="nav-item nav-link" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idProveedorEncriptado; ?>&ind=p">Conversaciones</a>
+                <a class="navbar-brand" href="../Proveedor/infoPerfil.php?id=<?php echo $idProveedorEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -141,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['mensaje'])) {
             <?php endwhile; ?>
         </div>
         <div class="chat-footer">
-            <form method="POST" action="conversaciones.php?idUsuario=<?php echo urlencode($idUsuario); ?>&idServicio=<?php echo urlencode($idServicio); ?>&idBoda=<?php echo urlencode($idBoda); ?>&ind=<?php echo urlencode($ind) ?>">
+            <form method="POST" action="conversaciones.php?idUsuario=<?php echo base64_encode($idUsuario); ?>&idServicio=<?php echo base64_encode($idServicio); ?>&idBoda=<?php echo base64_encode($idBoda); ?>&ind=<?php echo urlencode($ind); ?>&idProveedor=<?php echo base64_encode($idProveedor);?>">
                 <input type="text" name="mensaje" placeholder="Escribe un mensaje..." required>
                 <button type="submit">Enviar</button>
             </form>

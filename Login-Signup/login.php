@@ -18,7 +18,8 @@ function verificarCredenciales($Usuario, $Contraseña) {
         $contraseñaHash = $fila['contraseña'];
         $estatusUsuario = $fila['estatus'];
         $tipoUsuario = $fila['tipoUsuario'];
-        $id = $fila['id']; // Asumiendo que 'id' es el identificador del usuario
+        $idSinCodificar = $fila['id'];
+        $id = base64_encode($idSinCodificar);
 
         // 2. Verificar si el usuario está en la base de datos de login (intentos fallidos)
         $sqlVerificarLogin = "SELECT intentos, tiempoBloqueado FROM login WHERE usuario = '$Usuario'";
@@ -48,14 +49,59 @@ function verificarCredenciales($Usuario, $Contraseña) {
                     } else {
                         // Usuario activo, redirigir según el tipo de usuario
                         if($tipoUsuario == "Ayudante de boda") {
-                            header('location:infoAyudante.php?success="Bienvenido"');
-                            exit();
+                            $sqlAyudante = "SELECT * FROM ayudantes WHERE idUsuario = $idSinCodificar";
+                            $queryAyudante = $Conexion->query($sqlAyudante);
+                            if (mysqli_num_rows($queryAyudante) > 0) {//El ayudante ya esta en una boda
+                                $row = $queryAyudante->fetch_assoc();
+                                $idBodaSinEncriptar = $row['idEvento'];
+                                $idBoda = base64_encode($idBodaSinEncriptar);
+                                header("Location: ../Novias/panelGeneral.php?idUsuario=$id&idBoda=$idBoda");
+                                exit();
+                            }else{//No esta en ninguna boda
+                                header('location:infoAyudante.php?success="Bienvenido&id='. $id .'"');
+                                exit();
+                            }
+                            
                         } elseif ($tipoUsuario == "Proveedor") {
-                            header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor&id='. $id .'"');
+                            header('location:../Proveedor/infoCuenta.php?success=Bienvenido proveedor&id='. $id .'');
                             exit();
                         } else {
-                            header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
-                            exit();
+                            // Checar si hay un evento y obtener el ID del evento
+                            $sqlVerificarBoda = "SELECT idEvento FROM bodas WHERE usuario = '$idSinCodificar'";
+                            $queryVeriBoda = $Conexion->query($sqlVerificarBoda);
+                            if (mysqli_num_rows($queryVeriBoda) > 0) { //si esta dentro de una boda
+                                $row = mysqli_fetch_row($queryVeriBoda);
+                                $idBodaSinEncriptar = $row[0];
+                                $idBoda = base64_encode($idBodaSinEncriptar);
+                                // Checar si hay elementos seleccionados en la boda
+                                $sqlVerificarElementos = "SELECT * FROM elementosboda WHERE evento = '$idBodaSinEncriptar'";
+                                $queryVerificarElementos = $Conexion->query($sqlVerificarElementos);
+    
+                                if (mysqli_num_rows($queryVerificarElementos) == 0) {
+                                    // No hay elementos seleccionados, redirigir a seleccionElementos
+                                    header('location:../Novias/seleccionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda .'');
+                                    exit();
+    
+                                } else {
+                                    // Hay elementos, ahora checar si tienen descripción
+                                    $sqlVerificarDescripcion = "SELECT * FROM elementosboda WHERE evento = '$idBodaSinEncriptar' AND (descripcion IS NULL OR descripcion = '')";
+                                    $queryVerificarDescripcion = $Conexion->query($sqlVerificarDescripcion);
+    
+                                    if (mysqli_num_rows($queryVerificarDescripcion) > 0) {
+                                        // Hay elementos sin descripción, redirigir a descripcionElementos
+                                        header('location:../Novias/descripcionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda .'');
+                                        exit();
+    
+                                    } else {
+                                        // Todos los elementos tienen descripción, redirigir a tableroGeneral
+                                        header('location:../Novias/panelGeneral.php?idUsuario=' . $id . '&idBoda=' . $idBoda .'');
+                                        exit();
+                                    }
+                                }
+                            }else{
+                                header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
+                                exit();
+                            }
                         }
                     }
                 } else {
@@ -91,14 +137,70 @@ function verificarCredenciales($Usuario, $Contraseña) {
                 } else {
                     // Usuario activo, redirigir según el tipo de usuario
                     if($tipoUsuario == "Ayudante de boda") {
-                        header('location:infoAyudante.php?success="Bienvenido&id='. $id .'""');
-                        exit();
+                        $sqlAyudante = "SELECT * FROM ayudantes WHERE idUsuario = $idSinCodificar";
+                        $queryAyudante = $Conexion->query($sqlAyudante);
+                        if (mysqli_num_rows($queryAyudante) > 0) {//El ayudante ya esta en una boda
+                            $row = $queryAyudante->fetch_assoc();
+                            $idBodaSinEncriptar = $row['idEvento'];
+                            $idBoda = base64_encode($idBodaSinEncriptar);
+                            header("Location: ../Novias/panelGeneral.php?idUsuario=$id&idBoda=$idBoda");
+                            exit();
+                        }else{//No esta en ninguna boda
+                            header('location:infoAyudante.php?success="Bienvenido&id='. $id .'"');
+                            exit();
+                        }
+                        
                     } elseif ($tipoUsuario == "Proveedor") {
-                        header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor&id='. $id .'"');
-                        exit();
+                        $sqlProveedor = "SELECT * FROM proveedores WHERE idUsuario = $idSinCodificar";
+                        $queryProveedor = $Conexion->query($sqlProveedor);
+                        if (mysqli_num_rows($queryProveedor) > 0) {//El proveedor ya tiene cuenta
+                            $row = $queryProveedor->fetch_assoc();
+                            $idProveedorSinEncriptar = $row['id'];
+                            $idProveedor = base64_encode($idProveedorSinEncriptar);
+                            header("Location: ../Proveedor/panelServicios.php?id=$idProveedor");
+                            exit();
+                        }else{//No esta en ninguna cuenta
+                            header('location:../Proveedor/infoCuenta.php?success=Bienvenido proveedor&id='. $id .'');
+                            exit();
+                        }
+                        
                     } else {
-                        header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio&id='. $id .'""');
-                        exit();
+                        // Checar si hay un evento y obtener el ID del evento
+                        $sqlVerificarBoda = "SELECT idEvento FROM bodas WHERE usuario = '$idSinCodificar'";
+                        $queryVeriBoda = $Conexion->query($sqlVerificarBoda);
+                        if (mysqli_num_rows($queryVeriBoda) > 0) { //si esta dentro de una boda
+                            $row = mysqli_fetch_row($queryVeriBoda);
+                            $idBodaSinEncriptar = $row[0];
+                            $idBoda = base64_encode($idBodaSinEncriptar);
+                            // Checar si hay elementos seleccionados en la boda
+                            $sqlVerificarElementos = "SELECT * FROM elementosboda WHERE evento = '$idBodaSinEncriptar'";
+                            $queryVerificarElementos = $Conexion->query($sqlVerificarElementos);
+
+                            if (mysqli_num_rows($queryVerificarElementos) == 0) {
+                                // No hay elementos seleccionados, redirigir a seleccionElementos
+                                header('location:../Novias/seleccionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda .'');
+                                exit();
+
+                            } else {
+                                // Hay elementos, ahora checar si tienen descripción
+                                $sqlVerificarDescripcion = "SELECT * FROM elementosboda WHERE evento = '$idBodaSinEncriptar' AND (descripcion IS NULL OR descripcion = '')";
+                                $queryVerificarDescripcion = $Conexion->query($sqlVerificarDescripcion);
+
+                                if (mysqli_num_rows($queryVerificarDescripcion) > 0) {
+                                    // Hay elementos sin descripción, redirigir a descripcionElementos
+                                    header('location:../Novias/descripcionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda .'');
+                                    exit();
+
+                                } else {
+                                    // Todos los elementos tienen descripción, redirigir a tableroGeneral
+                                    header('location:../Novias/panelGeneral.php?idUsuario=' . $id . '&idBoda=' . $idBoda .'');
+                                    exit();
+                                }
+                            }
+                        }else{
+                            header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
+                            exit();
+                        }
                     }
                 }
             } else {
@@ -155,7 +257,7 @@ if (isset($_POST['Usuario']) && isset($_POST['Contraseña'])) {
     <?php
     if ($estatusInactivo == 1) {
       ?>
-      <form action="confirmarCorreo.php?id=<?php echo $id; ?>" method="post">
+      <form action="confirmarCorreo.php" method="post">
         <label>Para activar tu correo</label><br>
         <button class="btn btn-light" type="submit">Da clik aqui</button>
       </form>

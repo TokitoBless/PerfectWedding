@@ -2,12 +2,14 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $idEncriptado = $_GET['id'];
+    $id = base64_decode($idEncriptado);
 
     $sqlServicio = "SELECT * FROM servicios WHERE id = '$id'";
     $result = $Conexion->query($sqlServicio);
     $servicio = $result->fetch_assoc();
-    $idProveedor = $servicio['proveedor'];
+    $idProveedorSinEncriptar = $servicio['proveedor'];
+    $idProveedor = base64_encode($idProveedorSinEncriptar);
 } else {
     // Redirigir si no hay ID del servicio
     header('Location: agregarServicio.php?error="No se proporcionó ID de servicio"');
@@ -81,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $idProveedor; ?>">Servicios</a>
-                <a class="nav-item nav-link" href="conversaciones.php?id=<?php echo $idProveedor; ?>">Conversaciones</a>
+                <a class="nav-item nav-link" href="../Chats/listaMensajes.php?idUsuario=<?php echo $id; ?>&ind=P">Conversaciones</a>
                 <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $idProveedor; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
@@ -92,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <br>
 <h3>Editar Servicio</h3>
 
-<form action="editarServicio.php?id=<?php echo $id;?>" method="post" enctype="multipart/form-data">
+<form action="editarServicio.php?id=<?php echo $idEncriptado;?>" method="post" enctype="multipart/form-data">
     <div class="container">
         <div class="row align-items-start">
             <div class="col">

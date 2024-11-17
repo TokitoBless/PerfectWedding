@@ -3,7 +3,8 @@ session_start();
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $idEncriptado = $_GET['id'];
+    $id = base64_decode($idEncriptado);
 
     $sql = "SELECT * FROM proveedores WHERE id = '$id'";
     $result = $Conexion->query($sql);
@@ -37,10 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $Conexion->query($sqlActualizar);
 
     if ($result) {
-        header('Location: infoPerfil.php?success=Proveedor actualizado&id=' . $id);
-        exit();
+        echo '<script language="javascript">alert("La informacion del proveedor ha sido actualizada"); window.location.href = "infoPerfil.php?id=' . $idEncriptado . '";</script>';
     } else {
-        header('Location: infoPerfil.php?id=' . $id . '&error="Error al actualizar el proveedor"');
+        header('Location: infoPerfil.php?id=' . $idEncriptado . '&error="Error al actualizar el proveedor"');
         exit();
     }
 }
@@ -69,9 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $id; ?>">Servicios</a>
-                <a class="nav-item nav-link" href="conversaciones.php?id=<?php echo $id; ?>">Conversaciones</a>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $id; ?>">
+                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $idEncriptado; ?>">Servicios</a>
+                <a class="nav-item nav-link" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idEncriptado; ?>&ind=P">Conversaciones</a>
+                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $idEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="row gx-5">
     <div class="col col-padding-10">
      <div class="p-3">
-        <form class="form-container-perfil" action="infoPerfil.php?id=<?php echo $id; ?>" method="POST">
+        <form class="form-container-perfil" action="infoPerfil.php?id=<?php echo $idEncriptado; ?>" method="POST">
             <div class="row">
                 <div class="column">
                     <label for="apellido_paterno">Apellido Paterno:</label>

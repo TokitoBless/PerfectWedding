@@ -13,8 +13,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
 $sqlCategoria = "
     SELECT DISTINCT e.elemento, presupuesto
     FROM elementosboda e 
-    WHERE e.usuario = $idUsuario 
-    AND e.evento = $idBoda
+    WHERE e.evento = $idBoda
 ";
 $queryCategoria = $Conexion->query($sqlCategoria);
 

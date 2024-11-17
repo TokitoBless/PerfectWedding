@@ -2,7 +2,8 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $idEncriptado = $_GET['id'];
+    $id = base64_decode($idEncriptado);
 
     $sqlProveedor = "SELECT * FROM proveedores WHERE id = '$id'";
     $result = $Conexion->query($sqlProveedor);
@@ -55,7 +56,7 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
     $queryAgregar = $Conexion->query($sqlAgregar);
 
     if ($queryAgregar) {
-        echo '<script language="javascript">alert("Se agrego un servicio exitosamente");window.location.href = "panelServicios.php?id=' . $id . '";</script>';
+        echo '<script language="javascript">alert("Se agrego un servicio exitosamente");window.location.href = "panelServicios.php?id=' . $idEncriptado . '";</script>';
         
     } else {
         echo "Error: " . $sqlAgregar . "<br>" . $Conexion->error;
@@ -87,9 +88,9 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $id; ?>">Servicios</a>
-                <a class="nav-item nav-link" href="conversaciones.php?id=<?php echo $id; ?>">Conversaciones</a>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $id; ?>">
+                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $idEncriptado; ?>">Servicios</a>
+                <a class="nav-item nav-link" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idEncriptado; ?>&ind=P">Conversaciones</a>
+                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $idEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -99,7 +100,7 @@ if (isset($_POST['nombreServicio']) && isset($_POST['descripcion']) && isset($_P
 <br>
 <h3>Nuevo Servicio</h3>
 
-<form action="agregarServicio.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
+<form action="agregarServicio.php?id=<?php echo $idEncriptado; ?>" method="post" enctype="multipart/form-data">
 <div class="container">
   <div class="row align-items-start">
     <div class="col">

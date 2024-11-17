@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
 
     <!-- Categorías de Lugar -->
-    <h4>Lugar</h4>
+    <h4>Evento</h4>
     <?php
     $lugar = [
         'Lugar' => ['playa', 'casino', 'jardin', 'salón de eventos'],

@@ -2,7 +2,8 @@
 include_once('../Conexion/conexion.php');
 
 // Obtiene el ID del header desde la URL
-$id = isset($_GET['id']) ? $_GET['id'] : '';
+$idEncriptado = isset($_GET['id']) ? $_GET['id'] : '';
+$id = base64_decode($idEncriptado);
 ?>
 
 <!DOCTYPE html>
@@ -28,9 +29,9 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $id; ?>">Servicios</a>
-                <a class="nav-item nav-link" href="../Chats/listaMensajes.php?idUsuario=<?php echo $id; ?>&ind=P">Conversaciones</a>
-                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $id; ?>">
+                <a class="nav-item nav-link" href="panelServicios.php?id=<?php echo $idEncriptado; ?>">Servicios</a>
+                <a class="nav-item nav-link" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idEncriptado; ?>&ind=P">Conversaciones</a>
+                <a class="navbar-brand" href="infoPerfil.php?id=<?php echo $idEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -40,7 +41,7 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
 <br>
 <div class="header-container">
     <h3>Servicios agregados</h3>
-    <a class="btn btn-info btn-agregar" type="submit" href="agregarServicio.php?id=<?php echo $id; ?>">Agregar</a>
+    <a class="btn btn-info btn-agregar" type="submit" href="agregarServicio.php?id=<?php echo $idEncriptado; ?>">Agregar</a>
 </div>
 
 <!-- Card -->
@@ -52,6 +53,7 @@ if ($queryServicios->num_rows > 0) {
     echo "<div class='card-container'>";
     while ($row = $queryServicios->fetch_assoc()) {
         $idServicio = $row['id'];
+        $idServicioEncriptado = base64_encode($idServicio);
         $nombreServicio = $row['nombreServicio'];
         $descripcionServicio = $row['descripcion'];
         $precio =  "$" . $row['precio'];
@@ -68,7 +70,7 @@ if ($queryServicios->num_rows > 0) {
 
         echo "
         <div class='card' style='width: 12rem;' data-bs-toggle='modal' data-bs-target='#serviceModal' 
-            data-id='$idServicio' data-cali='$calificacion' data-images='" . json_encode($imagenes) . "' data-name='$nombreServicio' data-descrip='$descripcionServicio' data-precio='$precio'>
+            data-id='$idServicioEncriptado' data-cali='$calificacion' data-images='" . json_encode($imagenes) . "' data-name='$nombreServicio' data-descrip='$descripcionServicio' data-precio='$precio'>
             <div class='card-img-container'>
                 <img src='{$imagenes[0]}' class='card-img-top' alt='$nombreServicio'>
             </div>

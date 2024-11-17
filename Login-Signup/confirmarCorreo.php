@@ -3,7 +3,8 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['id'])) {
-  $ID = $_GET['id'];
+  $IDEncriptado = $_GET['id'];
+  $ID = base64_decode($IDEncriptado);
   $codigo = null;
   if (isset($_GET['codigo'])) {
     $codigo = $_GET['codigo'];
@@ -24,10 +25,10 @@ if (isset($_GET['id'])) {
         $queryUpdate = $Conexion->query($sqlUpdate);
         if($tipoUsuario == "Ayudante de boda")
         {
-          header('location:infoAyudante.php?success="Bienvenido"');
+          header('location:infoAyudante.php?success="Bienvenido&id='. $IDEncriptado .'"');
           exit();
         }elseif ($tipoUsuario == "Proveedor") {
-          header('location:../Proveedor/infoCuenta.php?success="Bienvenido proveedor"');
+          header('location:../Proveedor/infoCuenta.php?success=Bienvenido proveedor&id='. $IDEncriptado .'');
           exit();
         }else {
           header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
@@ -106,7 +107,7 @@ if (isset($_GET['id'])) {
         <p>El codigo fue enviado a su correo electronico</p>
         <br>
         <input type="number" name="codigo" placeholder="Codigo de confirmacion" required style="width: 300px; padding: 5px; ">
-        <input type="hidden" name="id" id="id" value="<?php echo $ID?>">
+        <input type="hidden" name="id" id="id" value="<?php echo base64_encode($ID)?>">
         <br><br><br>
         <div class="d-grid gap-2 col-6 mx-auto">
             <button class="btn btn-dark" type="submit">Confirmar</button>
@@ -116,7 +117,7 @@ if (isset($_GET['id'])) {
     <br>
 
     <form action="confirmarCorreo.php" method="GET">
-        <input type="hidden" name="id" id="id" value="<?php echo $ID?>">
+        <input type="hidden" name="id" id="id" value="<?php echo base64_encode($ID)?>">
         <input type="hidden" name="reenviar" value="1">
         <div class="d-grid gap-2 col-6 mx-auto">
             <button class="btn btn-info btn-morado" type="submit">Reenviar código</button>

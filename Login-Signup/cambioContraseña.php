@@ -5,12 +5,13 @@ if(isset($_GET['id'])) {
 $id =  base64_decode($_GET['id']);
 if (isset($_POST['nuevaContraseña']) && isset($_POST['confirmarContraseña']) ) {
   $Nueva = $_POST['nuevaContraseña'];
+  $ContraseñaHash = password_hash($Nueva, PASSWORD_DEFAULT);
   $Confirmar = $_POST['confirmarContraseña'];
   if($Nueva == $Confirmar){
-    $sqlCambio = "UPDATE usuarios SET contraseña = '$Nueva' WHERE id = '$id'";
+    $sqlCambio = "UPDATE usuarios SET contraseña = '$ContraseñaHash' WHERE id = '$id'";
     $queryCambio = $Conexion->query($sqlCambio);
     if ($queryCambio) {
-      echo '<script language="javascript">alert("Se realizo el cambio de contraseña con exito?contra= '. $sqlCambio.'");window.location.href = "login.php";</script>';
+      echo '<script language="javascript">alert("Se realizo el cambio de contraseña con exito");window.location.href = "login.php";</script>';
     }else{
 
     }

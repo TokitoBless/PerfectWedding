@@ -84,7 +84,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
         </thead>
         <tbody>
         <?php
-            $sqlNotificaciones = "SELECT * FROM notificaciones WHERE idEvento = '$idBoda' AND	idUsuario = '$idUsuario'";
+            $sqlNotificaciones = "SELECT * FROM notificaciones WHERE idEvento = '$idBoda' AND	idUsuario = '$idUsuario' ORDER BY fecha DESC";
             $queryNotificaciones = $Conexion->query($sqlNotificaciones);
 
             if ($queryNotificaciones->num_rows > 0) {

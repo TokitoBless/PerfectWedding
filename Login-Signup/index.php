@@ -55,6 +55,28 @@ include_once('../Conexion/conexion.php');
     }
 }
 
+$sqlVerificarUsuarios = "SELECT * FROM usuarios";
+$queryVeriUsuarios = $Conexion->query($sqlVerificarUsuarios);
+
+while ($row = $queryVeriUsuarios->fetch_assoc()) {
+  $fechaCreacion = new DateTime($row['fechaRegistro']);
+  $fechaCreacion->modify('+7 days');
+  $fechaActual = new DateTime();
+
+  $usuario = $row['usuario'];
+  $estatus = $row['estatus'];
+
+  if($estatus == 'Inactivo'){
+    if ($fechaActual >= $fechaCreacion) {//Hoy es mayor a una semana del registro
+      $sqlEliminarInactivo = "DELETE FROM usuarios WHERE usuario = '$usuario'";    
+      $queryEliminarInactivo = $Conexion->query($sqlEliminarInactivo);
+    }
+
+  }
+
+
+}
+
 ?>
 
 <!DOCTYPE html>

@@ -3,8 +3,10 @@ include_once('../Conexion/conexion.php');
 include_once('../Novias/validacionesUsuarios.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['ind'])) {
-    $idUsuario = $_GET['idUsuario'];
-    $idBoda = isset($_GET['idBoda']) ? $_GET['idBoda'] : '';
+    $idUsuarioEncriptado = $_GET['idUsuario'];
+    $idUsuario = base64_decode($idUsuarioEncriptado);
+    $idBodaEncriptado = isset($_GET['idBoda']) ? $_GET['idBoda'] : '';
+    $idBoda = base64_decode($idBodaEncriptado);
     $ind = strtolower($_GET['ind']);
 } else {
     header('Location: listaMensajes.php?error="No se proporcionó ID de usuario ni de boda"');
@@ -101,9 +103,9 @@ $queryDestinatarios = $Conexion->query($sqlDestinatarios);
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="../Proveedor/panelServicios.php?id=<?php echo $idUsuario; ?>">Servicios</a>
-                <a class="nav-item nav-link" href="../Proveedor/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&ind=p">Conversaciones</a>
-                <a class="navbar-brand" href="../Proveedor/infoPerfil.php?id=<?php echo $idUsuario; ?>">
+                <a class="nav-item nav-link" href="../Proveedor/panelServicios.php?id=<?php echo $idUsuarioEncriptado; ?>">Servicios</a>
+                <a class="nav-item nav-link" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&ind=p">Conversaciones</a>
+                <a class="navbar-brand" href="../Proveedor/infoPerfil.php?id=<?php echo $idUsuarioEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -116,7 +118,7 @@ $queryDestinatarios = $Conexion->query($sqlDestinatarios);
     <ul>
         <?php while($row = $queryDestinatarios->fetch_assoc()): ?>
             <li>
-                <a href="conversaciones.php?idUsuario=<?php echo urlencode($row['idUsuario']); ?>&idServicio=<?php echo urlencode($row['idServicio']); ?>&idBoda=<?php echo urlencode($row['idBoda']); ?>&ind=<?php echo urlencode($ind) ?>">
+                <a href="conversaciones.php?idUsuario=<?php echo base64_encode($row['idUsuario']); ?>&idServicio=<?php echo base64_encode($row['idServicio']); ?>&idBoda=<?php echo base64_encode($row['idBoda']); ?>&ind=<?php echo urlencode($ind) ?>&idProveedor=<?php echo base64_encode($idUsuario);?>">
                     <?php echo htmlspecialchars($row['nombre']); ?>
                 </a>
             </li>

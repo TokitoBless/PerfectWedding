@@ -267,7 +267,7 @@ if ($queryTarea->num_rows > 0) {
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2 id="modalTitle"></h2>
-        <p id="modalDescription"></p>
+        <b>Descripcion de la tarea:</b><p id="modalDescription"></p>
 
         <!-- Barra de progreso -->
         <label for="taskProgress">Progreso:</label>
@@ -284,13 +284,13 @@ if ($queryTarea->num_rows > 0) {
         <input type="checkbox" name="checkboxcompletado" id="checkboxcompletado" class="Ocultar">
         </label>
         </div>
-        <label id="numeroDeSubtareas">Numero Subtareas: <p id="numeroSubtareas"></p></label>
+        <label id="numeroDeSubtareas"><b>Numero Subtareas: </b><p id="numeroSubtareas"></p></label>
 
-        <p id="fecha" name="fecha"></p>
-        <p id="nombreEncargado" name="nombreEncargado"></p>
+        <b>Fecha limite:</b><p id="fecha" name="fecha"></p>
+        <b>Nombre del endargado:</b><p id="nombreEncargado" name="nombreEncargado"></p>
         <!-- Mostrar comentarios -->
         <div id="commentsSection">
-            <h3>Comentarios:</h3>
+            <h5>Comentarios:</h5>
             <div id="commentsList"></div>
             <textarea id="newComment" placeholder="Escribe un nuevo comentario"></textarea>
         </div>
@@ -308,7 +308,7 @@ if ($queryTarea->num_rows > 0) {
 <script>
     //Ocultar para ayudantes 
     document.addEventListener("DOMContentLoaded", function() {
-        const mostrarDiv = <?php echo json_encode($mostrarDiv); ?>; // Convierte a JSON
+        const mostrarDiv = <?php echo json_encode($mostrarDiv); ?>; 
         const elements = document.querySelectorAll('.agregarInvitadoOcultar');
 
         elements.forEach(function(element) {
@@ -386,6 +386,11 @@ function openModal(tarea, idBoda) {
         document.getElementById('checkboxesvalidaciones').style.display = "none";
     }else{
         document.getElementById('checkboxesvalidaciones').style.display = "block";
+    }
+    if(tarea.numeroSubtareas == 0){ // si soy tarea sin subtareas
+        document.getElementById('numeroDeSubtareas').style.display = "none";
+    }else{
+        document.getElementById('numeroDeSubtareas').style.display = "block";
     }
 
     // Configurar el porcentaje de progreso
