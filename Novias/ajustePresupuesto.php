@@ -4,8 +4,10 @@ include_once('../Conexion/conexion.php');
 
 // Obtener el usuario y boda de la URL
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $idUsuario = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idEncriptado = $_GET['idUsuario'];
+    $idUsuario = base64_decode($idEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
     $categoriaUrl = $_GET['categoria'];
     $sqlSelecionarBoda = "SELECT presupuestoTotal FROM bodas WHERE idEvento = '$idBoda'";
     $querySelecionarBoda = $Conexion->query($sqlSelecionarBoda); 
@@ -268,7 +270,7 @@ guardarBtn.addEventListener('click', function() {
         elementos: elementosData
     };
 
-    const url = `panelGeneral.php?idUsuario=${encodeURIComponent(idUsuario)}&idBoda=${encodeURIComponent(idBoda)}`;
+    const url = `panelGeneral.php?idUsuario=${btoa(idUsuario)}&idBoda=${btoa(idBoda)}`;
 
     // Enviar los datos al archivo PHP mediante fetch()
     fetch('guardarElementos.php', {

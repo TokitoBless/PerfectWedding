@@ -2,8 +2,10 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $idUsuario = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idUsuarioEncriptado = $_GET['idUsuario'];
+    $idUsuario = base64_decode($idUsuarioEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
 } else {
     header('Location: panelGeneral.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
@@ -132,9 +134,9 @@ if ($queryPrecios->num_rows > 0) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
-                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tabla Kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -142,8 +144,8 @@ if ($queryPrecios->num_rows > 0) {
                             Mensajes
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
-                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?> &ind=I">Mensajes</a></li>
                         </ul>
                         </li>
                     </ul>
@@ -155,13 +157,13 @@ if ($queryPrecios->num_rows > 0) {
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tableros favoritos</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -330,7 +332,7 @@ function filtrarServicios(){
         // Crear un formulario
         var form = document.createElement("form");
         form.method = "POST";
-        form.action = "panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>";
+        form.action = "panelGeneral.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>";
 
         // Crear los campos del formulario
         var input = document.createElement("input");
@@ -392,7 +394,6 @@ if ($queryServicios->num_rows > 0) {
         $calificacion = $row['calificacion'];
         $categoria = $row['categoria'];
         $palabraClave = $row['palabraClave'];
-
         $sqlInformacionProveedor = "SELECT * FROM proveedores WHERE id = '$idProveedor'";
         $queryInformacionProveedor= $Conexion->query($sqlInformacionProveedor);
         $rowProveedor = $queryInformacionProveedor->fetch_assoc();
@@ -555,9 +556,9 @@ if ($queryServicios->num_rows > 0) {
                 modalSitioWeb.textContent = sitioWeb;
             }
 
-            solicitarPresupuestoBtn.href = `solicitarPresupuesto.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
-            compartirServicio.href = `compartir.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
-            guardarServicio.href = `guardarServicioCard.php?idBoda=${idBoda}&idUsuario=${idUsuario}&idServicio=${id}`;
+            solicitarPresupuestoBtn.href = `solicitarPresupuesto.php?idBoda=${btoa(idBoda)}&idUsuario=${btoa(idUsuario)}&idServicio=${btoa(id)}`;
+            compartirServicio.href = `compartir.php?idBoda=${btoa(idBoda)}&idUsuario=${btoa(idUsuario)}&idServicio=${btoa(id)}`;
+            guardarServicio.href = `guardarServicioCard.php?idBoda=${btoa(idBoda)}&idUsuario=${btoa(idUsuario)}&idServicio=${btoa(id)}`;
 
             // Enviar datos al servidor
             const data = {
@@ -582,7 +583,7 @@ if ($queryServicios->num_rows > 0) {
                 if (data && data.trim() !== ''){
                     if (confirm(data + "\n¿Quieres ajustar los presupuestos?")) {
                         // Si presiona "Aceptar", redirige 
-                        window.location.href = `ajustePresupuesto.php?idBoda=${idBoda}&idUsuario=${idUsuario}&categoria=${categoria}`;
+                        window.location.href = `ajustePresupuesto.php?idBoda=${btoa(idBoda)}&idUsuario=${btoa(idUsuario)}&categoria=${categoria}`;
                     } else {
                         // Si presiona "Cancelar", solo se cierra el alert 
                     }

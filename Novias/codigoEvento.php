@@ -2,7 +2,8 @@
 include_once('../Conexion/conexion.php');
 
 // Obtiene el ID del header desde la URL
-$id = isset($_GET['id']) ? $_GET['id'] : '';
+$idEncriptado = isset($_GET['id']) ? $_GET['id'] : '';
+$id = base64_decode($idEncriptado);
 
 if(isset($_POST['usuarioBoda'])){
   $usuarioIngresado = $_POST['usuarioBoda'];//usuario ingresado
@@ -21,9 +22,12 @@ if(isset($_POST['usuarioBoda'])){
     if (mysqli_num_rows($queryVeriBoda) > 0) {
       //El usuario esta en la tabla da bodas
       $filaBoda = $queryVeriBoda->fetch_assoc();
-      $idBoda = $filaBoda['idEvento'];//sacar el id de la boda
-
-      echo '<script language="javascript">alert("Suerte ayudando!!!");window.location.href = "panelGeneral.php?idUsuario=' . $id . '&idBoda=' . $idBoda . '";</script>';
+      $idBodaSinEncriptar = $filaBoda['idEvento'];//sacar el id de la boda
+      $idBoda = base64_encode($idBodaSinEncriptar);
+      
+      $sqlIngresarAyudante = "INSERT INTO ayudantes (idEvento, idUsuario) VALUES ('$idBodaSinEncriptar', '$id')";
+      $queryIngresarAyudante = $Conexion->query($sqlIngresarAyudante);
+      echo '<script language="javascript">alert("Suerte ayudando!!!");window.location.href = "panelGeneral.php?idUsuario=' . $idEncriptado . '&idBoda=' . $idBoda . '";</script>';
     }else {
       // No hay ninguna boda con ese usuario como encargado
       echo '<script language="javascript">alert("No hay ninguna boda con ese usuario como encargado");</script>';
@@ -69,13 +73,13 @@ if(isset($_POST['usuarioBoda'])){
         <h4 class="card-title">Codigo del evento</h3>
         <h6 class="card-subtitle mb-2 text-body-secondary">Para ser parte de esta boda, ingresa el usuario de la persona que creo el evento</h6>
         <br><br>
-        <form action="codigoEvento.php?id=<?php echo $id; ?>" method="POST">
+        <form action="codigoEvento.php?id=<?php echo $idEncriptado; ?>" method="POST">
             <input type="text" name="usuarioBoda">
             <br><br><br>
             <button class="btn btn-rosa"  type="submit">Ayudar en esta boda</button>
             <br><br>
         </form>
-        <a class="btn btn-morado " href="crearEvento.php?id=<?php echo $id; ?>" role="button">Crear tu propio evento</a>
+        <a class="btn btn-morado " href="crearEvento.php?id=<?php echo $idEncriptado; ?>" role="button">Crear tu propio evento</a>
         <br><br>
     </div>
     </div>

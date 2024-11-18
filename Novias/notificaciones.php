@@ -2,8 +2,10 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $idUsuario = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idUsuarioEncriptado = $_GET['idUsuario'];
+    $idUsuario = base64_decode($idUsuarioEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
 } else {
     header('Location: notificaciones.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
@@ -19,7 +21,7 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <title>Tablero general</title>
+    <title>Notificaciones</title>
 </head>
 <body>
 
@@ -34,9 +36,9 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
-                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tabla Kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -44,8 +46,8 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
                             Mensajes
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
-                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?> &ind=I">Mensajes</a></li>
                         </ul>
                         </li>
                     </ul>
@@ -57,13 +59,13 @@ if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tableros favoritos</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>

@@ -2,8 +2,10 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $idUsuario = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idUsuarioEncriptado = $_GET['idUsuario'];
+    $idUsuario = base64_decode($idUsuarioEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
     $sqlfechaBoda= "SELECT fechaBoda from bodas where usuario = '$idUsuario' and idEvento = '$idBoda'";
     $queryFechaBoda = $Conexion->query($sqlfechaBoda);
     $row = $queryFechaBoda->fetch_assoc();
@@ -103,9 +105,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
-                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tabla Kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -113,8 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             Mensajes
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
-                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?> &ind=I">Mensajes</a></li>
                         </ul>
                         </li>
                     </ul>
@@ -126,13 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tableros favoritos</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -143,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <h3>Tabla kanban</h3>    
 
 <div style="width: 700px; padding-left: 50px;">
-    <form action="agregarTareas.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>" method="POST">
+    <form action="agregarTareas.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>" method="POST">
     <!-- Titulo -->
         <div class="row mb-4">
             <label class="col-sm-3 col-form-label">Título:</label>

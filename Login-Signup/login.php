@@ -63,8 +63,18 @@ function verificarCredenciales($Usuario, $Contraseña) {
                             }
                             
                         } elseif ($tipoUsuario == "Proveedor") {
-                            header('location:../Proveedor/infoCuenta.php?success=Bienvenido proveedor&id='. $id .'');
-                            exit();
+                            $sqlProveedor = "SELECT * FROM proveedores WHERE idUsuario = $idSinCodificar";
+                            $queryProveedor = $Conexion->query($sqlProveedor);
+                            if (mysqli_num_rows($queryProveedor) > 0) {//El proveedor ya tiene cuenta
+                                $row = $queryProveedor->fetch_assoc();
+                                $idProveedorSinEncriptar = $row['id'];
+                                $idProveedor = base64_encode($idProveedorSinEncriptar);
+                                header("Location: ../Proveedor/panelServicios.php?id=$idProveedor");
+                                exit();
+                            }else{//No esta en ninguna cuenta
+                                header('location:../Proveedor/infoCuenta.php?success=Bienvenido proveedor&id='. $id .'');
+                                exit();
+                            }
                         } else {
                             // Checar si hay un evento y obtener el ID del evento
                             $sqlVerificarBoda = "SELECT idEvento FROM bodas WHERE usuario = '$idSinCodificar'";
@@ -99,7 +109,7 @@ function verificarCredenciales($Usuario, $Contraseña) {
                                     }
                                 }
                             }else{
-                                header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
+                                header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio&id=' . $id . '"');
                                 exit();
                             }
                         }
@@ -198,7 +208,7 @@ function verificarCredenciales($Usuario, $Contraseña) {
                                 }
                             }
                         }else{
-                            header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio"');
+                            header('location:../Novias/codigoEvento.php?success="Bienvenido novia/novio&id=' . $id . '"');
                             exit();
                         }
                     }

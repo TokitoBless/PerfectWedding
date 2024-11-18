@@ -2,8 +2,10 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $idUsuario = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idUsuarioEncriptado = $_GET['idUsuario'];
+    $idUsuario = base64_decode($idUsuarioEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
     $sqlfechaBoda= "SELECT fechaBoda from bodas where usuario = '$idUsuario' and idEvento = '$idBoda'";
     $queryFechaBoda = $Conexion->query($sqlfechaBoda);
     $row = $queryFechaBoda->fetch_assoc();
@@ -36,6 +38,10 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
 
     $sqlAgregar = "INSERT INTO reuniones (idEvento, nombreReunion, temas, fecha, hora, invitados, link) VALUES ('$idBoda', '$nombreReunion', '$temas', '$fechaReunion', '$horaReunion', '$invitados_serializados', '$linkZoom')";
     $queryAgregar = $Conexion->query($sqlAgregar);
+
+    $detallesNotificacion = "Has sido invitado a una reunión ". $nombreEvento .". La fecha y hora de la reunión es ". $fecha ." a las ". $hora .".";
+    $fechaC = new DateTime();
+    $fechaCreacion = $fechaC->format('Y-m-d'); 
 
     foreach ($invitados as $invitado) {
         
@@ -72,7 +78,9 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
     }
 
     if ($queryAgregar) {
-        header('Location: calendario.php?idUsuario=' . $idUsuario . '&idBoda=' . $idBoda . '&success=Reunión guardada correctamente');
+        $sqlGuardarNotificacion = "INSERT INTO notificaciones(idEvento, idUsuario, notificacion, fecha, detalles) VALUE ('$idBoda', '$idUsuario', 'Nuevo evento', '$fechaCreacion', '$detallesNotificacion' )";    
+        $queryGuardarElementoNotificacion = $Conexion->query($sqlGuardarNotificacion);
+        header('Location: calendario.php?idUsuario=' . $idUsuarioEncriptado . '&idBoda=' . $idBodaEncriptado . '&success=Reunión guardada correctamente');
         exit();
     } else {
         echo "Error al guardar la reunión: " . $Conexion->error;
@@ -111,9 +119,9 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
-                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tabla Kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -121,8 +129,8 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
                             Mensajes
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
-                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?> &ind=I">Mensajes</a></li>
                         </ul>
                         </li>
                     </ul>
@@ -134,13 +142,13 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tableros favoritos</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -152,7 +160,7 @@ if (isset($_POST['nombreReunion']) && isset($_POST['temas']) && isset($_POST['fe
 
     
 <div class="container d-flex justify-content-center">
-  <form action="agregarReunion.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>" method="POST" class="w-50">
+  <form action="agregarReunion.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>" method="POST" class="w-50">
     <div class="row mb-3">
       <!-- Nombre de la Reunión -->
       <div class="col-6 text-end">

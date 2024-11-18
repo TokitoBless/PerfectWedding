@@ -2,8 +2,10 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $id = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idEncriptado = $_GET['idUsuario'];
+    $id = base64_decode($idEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
     $sqlSelecionarBoda = "SELECT DISTINCT elemento FROM elementosboda WHERE usuario = '$id' AND evento = '$idBoda'";
     $querySelecionarBoda = $Conexion->query($sqlSelecionarBoda);
     $elementosBoda = [];
@@ -59,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Si se actualizó al menos un elemento, redirigir; de lo contrario, mostrar mensaje
     if ($actualizado) {
-        header("Location: panelGeneral.php?idUsuario=$id&idBoda=$idBoda");
+        header("Location: panelGeneral.php?idUsuario=$idEncriptado&idBoda=$idBodaEncriptado");
         exit();
     } else {
         echo "No se actualizaron elementos.";
@@ -94,12 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 </nav>
 
-<form action="descripcionElementos.php?idUsuario=<?php echo $id;?>&idBoda=<?php echo $idBoda; ?>" method="POST">
-<br><h3>Describe tu boda</h3>
-<div style="text-align: right; margin-top: 20px; padding-right: 10px;">
-    <button type="submit" class="btn btn-lila">Guardar</button>
-    <a type="button" class="btn btn-rosa" href="textoLibre.php?idUsuario=<?php echo $id;?>&idBoda=<?php echo $idBoda; ?>">Texto libre</a>
-</div>
+<form action="descripcionElementos.php?idUsuario=<?php echo $idEncriptado;?>&idBoda=<?php echo $idBodaEncriptado; ?>" method="POST">
+    <br><h3>Describe tu boda</h3>
+    <div style="text-align: right; margin-top: 20px; padding-right: 10px;">
+        <button type="submit" class="btn btn-lila">Guardar</button>
+        <a type="button" class="btn btn-rosa" href="textoLibre.php?idUsuario=<?php echo $idEncriptado;?>&idBoda=<?php echo $idBodaEncriptado; ?>">Texto libre</a>
+    </div>
 <div class="container mt-4">
     <!-- Categorías de Novia -->
     <h4>Novia</h4>

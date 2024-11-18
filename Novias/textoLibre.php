@@ -2,8 +2,10 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $id = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idEncriptado = $_GET['idUsuario'];
+    $id = base64_decode($idEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
     
 } else {
     header('Location: textoLibre.php?error="No se proporcionó ID de usuario ni de boda"');
@@ -135,16 +137,6 @@ if (curl_errno($ch)) {
         }
     }
     
-
-    /* Mostrar resultados
-    if (!empty($palabrasEncontradas)) {
-        foreach ($palabrasEncontradas as $categoria => $subcategoria) {
-            echo "<br>$categoria = $subcategoria<br>";
-        }
-    } else {
-        echo "No se encontraron palabras clave.";
-    }
-    */
     // Comparar categorías
     $faltanCategorias = array_diff_key($categorias, $palabrasEncontradas);
 
@@ -152,7 +144,7 @@ if (curl_errno($ch)) {
     if (!empty($faltanCategorias)) {
         $alerta = "Te falto describir algunas categorias, al pensar en tu boda como vizualizas:\n";
         foreach ($faltanCategorias as $categoria => $opciones) {
-            $alerta = $alerta . "Categoria: " . $categoria . "\npuedes elegir entre: ";  // Imprime el nombre de la categoría
+            $alerta = $alerta . "Tu " . $categoria . "\n, si no tienes ideas puedes elegir entre ";  // Imprime el nombre de la categoría
             foreach ($opciones as $palabra) {
                 $alerta = $alerta . $palabra . ", "; // Imprime cada palabra clave de la categoría
             }
@@ -174,7 +166,7 @@ if (curl_errno($ch)) {
             }
         }
         if (!$error) {
-            header("Location: panelGeneral.php?idUsuario=$id&idBoda=$idBoda");
+            header("Location: panelGeneral.php?idUsuario=$idEncriptado&idBoda=$idBodaEncriptado");
             exit();
         } else {
             echo "Error al actualizar el elemento: $categoria - " . $Conexion->error . "<br>";
@@ -217,11 +209,11 @@ curl_close($ch);
 </nav>
 
 <br><h3>Describe tu boda</h3>
-<form action="textoLibre.php?idUsuario=<?php echo $id;?>&idBoda=<?php echo $idBoda; ?>" method="post">
+<form action="textoLibre.php?idUsuario=<?php echo $idEncriptado;?>&idBoda=<?php echo $idBodaEncriptado; ?>" method="post">
 
     <div style="text-align: right; margin-top: 20px; padding-right: 10px;">
         <button type="submit" class="btn btn-lila">Guardar</button>
-        <a type="button" class="btn btn-rosa" href="descripcionElementos.php?idUsuario=<?php echo $id;?>&idBoda=<?php echo $idBoda; ?>">Formulario</a>
+        <a type="button" class="btn btn-rosa" href="descripcionElementos.php?idUsuario=<?php echo $idEncriptado;?>&idBoda=<?php echo $idBodaEncriptado; ?>">Formulario</a>
     </div>
     <br>
     <div style="padding: 30px">

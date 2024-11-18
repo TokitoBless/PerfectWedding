@@ -2,8 +2,10 @@
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $id = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idEncriptado = $_GET['idUsuario'];
+    $id = base64_decode($idEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
     $sqlSelecionarBoda = "SELECT presupuestoTotal FROM bodas WHERE usuario = '$id' AND idEvento = '$idBoda'";
     $querySelecionarBoda = $Conexion->query($sqlSelecionarBoda); 
     $row = mysqli_fetch_row($querySelecionarBoda);
@@ -345,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
             idBoda: idBoda,
             elementos: elementosData
         };
-        const url = `descripcionElementos.php?idUsuario=${encodeURIComponent(idUsuario)}&idBoda=${encodeURIComponent(idBoda)}`;
+        const url = `descripcionElementos.php?idUsuario=${btoa(idUsuario)}&idBoda=${btoa(idBoda)}`;
 
         // Enviar los datos al archivo PHP mediante fetch()
         fetch('guardarElementos.php', {

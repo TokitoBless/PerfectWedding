@@ -6,7 +6,8 @@ $eventoExistente = 0;
 
 // Obtiene el ID del header desde la URL
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $idEncriptado = $_GET['id'];
+    $id = base64_decode($idEncriptado);
 } else {
     // Redirigir si no hay ID del servicio
     header('Location: crearEvento.php?error="No se proporcionó ID del usuario"');
@@ -45,8 +46,9 @@ if (isset($_POST['fechaBoda']) && isset($_POST['estado']) && isset($_POST['presu
                 $sqlIdBoda = "SELECT MAX(idEvento) FROM bodas WHERE usuario = '$id'";
                 $queryIdBoda = $Conexion->query($sqlIdBoda);
                 $row = mysqli_fetch_row($queryIdBoda);
-                $idBoda = $row[0];
-                header('location:seleccionElementos.php?success=Evento creado&idUsuario=' . $id . '&idBoda='.$idBoda.'');
+                $idBodaSinEncriptar = $row[0];
+                $idBoda = base64_encode($idBodaSinEncriptar);
+                header('location:seleccionElementos.php?success=Evento creado&idUsuario=' . $idEncriptado . '&idBoda='.$idBoda.'');
                 exit();
             }
         }else{
@@ -77,30 +79,31 @@ if (isset($_POST['accion']) && $_POST['accion'] === 'editar') {
     $queryVeriBoda = $Conexion->query($sqlVerificarBoda);
 
     $row = mysqli_fetch_row($queryVeriBoda);
-    $idBoda = $row[0];
+    $idBodaSinEncriptar = $row[0];
+    $idBoda = base64_encode($idBodaSinEncriptar);
 
     // Checar si hay elementos seleccionados en la boda
-    $sqlVerificarElementos = "SELECT * FROM elementosboda WHERE evento = '$idBoda'";
+    $sqlVerificarElementos = "SELECT * FROM elementosboda WHERE evento = '$idBodaSinEncriptar'";
     $queryVerificarElementos = $Conexion->query($sqlVerificarElementos);
 
     if (mysqli_num_rows($queryVerificarElementos) == 0) {
         // No hay elementos seleccionados, redirigir a seleccionElementos
-        echo json_encode(['redirect' => 'seleccionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda]);
+        echo json_encode(['redirect' => 'seleccionElementos.php?idUsuario=' . $idEncriptado . '&idBoda=' . $idBoda]);
         exit();
 
     } else {
         // Hay elementos, ahora checar si tienen descripción
-        $sqlVerificarDescripcion = "SELECT * FROM elementosboda WHERE evento = '$idBoda' AND (descripcion IS NULL OR descripcion = '')";
+        $sqlVerificarDescripcion = "SELECT * FROM elementosboda WHERE evento = '$idBodaSinEncriptar' AND (descripcion IS NULL OR descripcion = '')";
         $queryVerificarDescripcion = $Conexion->query($sqlVerificarDescripcion);
 
         if (mysqli_num_rows($queryVerificarDescripcion) > 0) {
             // Hay elementos sin descripción, redirigir a descripcionElementos
-            echo json_encode(['redirect' => 'descripcionElementos.php?idUsuario=' . $id . '&idBoda=' . $idBoda]);
+            echo json_encode(['redirect' => 'descripcionElementos.php?idUsuario=' . $idEncriptado . '&idBoda=' . $idBoda]);
             exit();
 
         } else {
             // Todos los elementos tienen descripción, redirigir a tableroGeneral
-            echo json_encode(['redirect' => 'panelGeneral.php?idUsuario=' . $id . '&idBoda=' . $idBoda]);
+            echo json_encode(['redirect' => 'panelGeneral.php?idUsuario=' . $idEncriptado . '&idBoda=' . $idBoda]);
             exit();
         }
     }
@@ -135,7 +138,7 @@ if (isset($_POST['accion']) && $_POST['accion'] === 'editar') {
 <br>
 
 <center><br><br><br><br>
-<form action="crearEvento.php?id=<?php echo $id; ?>"  method="POST">
+<form action="crearEvento.php?id=<?php echo $idEncriptado; ?>"  method="POST">
     
 <div class="container">
     <div class="row justify-content-center">

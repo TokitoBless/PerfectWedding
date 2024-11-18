@@ -7,8 +7,10 @@ $anioActual = isset($_GET['anio']) ? (int)$_GET['anio'] : date('Y'); // Si se pa
 
 // Obtener el usuario y boda de la URL
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $idUsuario = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idUsuarioEncriptado = $_GET['idUsuario'];
+    $idUsuario = base64_decode($idUsuarioEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
 } else {
     header('Location: calendario.php?error="No se proporcionó ID de usuario ni de boda"');
     exit();
@@ -125,9 +127,9 @@ if ($mesSiguiente > 12) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
-                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tabla Kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -135,8 +137,8 @@ if ($mesSiguiente > 12) {
                             Mensajes
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
-                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?> &ind=I">Mensajes</a></li>
                         </ul>
                         </li>
                     </ul>
@@ -148,13 +150,13 @@ if ($mesSiguiente > 12) {
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tableros favoritos</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuario; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -165,8 +167,8 @@ if ($mesSiguiente > 12) {
 
 <h3>Calendario de reuniones</h3>
 <div style="text-align: right; margin-top: 20px; padding-right: 10px;">
-    <a class="btn btn-morado" type="submit" href="agregarEvento.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Agregar evento</a>
-    <a class="btn btn-morado" type="submit" href="agregarReunion.php?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>">Agregar videollamada</a>
+    <a class="btn btn-morado" type="submit" href="agregarEvento.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Agregar evento</a>
+    <a class="btn btn-morado" type="submit" href="agregarReunion.php?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Agregar videollamada</a>
 </div>
 
 <?php
@@ -188,11 +190,11 @@ $mesesEspanol = [
 ?>
 
 <div class="calendario-nav">
-    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesAnterior; ?>&anio=<?php echo $anioAnterior; ?>">
+    <a href="?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>&mes=<?php echo $mesAnterior; ?>&anio=<?php echo $anioAnterior; ?>">
         <img src="../Imagenes/antes.png" alt="MesAnterior" width="30" height="30">
     </a>
     <span><?php echo $mesesEspanol[$mesActual] . " " . $anioActual; ?></span>
-    <a href="?idUsuario=<?php echo $idUsuario; ?>&idBoda=<?php echo $idBoda; ?>&mes=<?php echo $mesSiguiente; ?>&anio=<?php echo $anioSiguiente; ?>">
+    <a href="?idUsuario=<?php echo $idUsuarioEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>&mes=<?php echo $mesSiguiente; ?>&anio=<?php echo $anioSiguiente; ?>">
         <img src="../Imagenes/siguiente.png" alt="MesSiguiente" width="30" height="30">
     </a>
 </div>

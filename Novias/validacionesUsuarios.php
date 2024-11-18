@@ -5,7 +5,7 @@ include_once('../Conexion/conexion.php');
 function noviaOnovio()
 {
     global $Conexion;
-    $idUsuario = $_GET['idUsuario'];
+    $idUsuario = base64_decode($_GET['idUsuario']);
     $sqlTipoUsuarios = "SELECT * FROM usuarios WHERE id = '$idUsuario' AND (tipoUsuario = 'Novia' OR tipoUsuario = 'Novio')";
     $queryTipoUsuarios = $Conexion->query($sqlTipoUsuarios);
 

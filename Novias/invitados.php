@@ -3,8 +3,10 @@ include_once('./validacionesUsuarios.php');
 include_once('../Conexion/conexion.php');
 
 if (isset($_GET['idUsuario']) && isset($_GET['idBoda'])) {
-    $id = $_GET['idUsuario'];
-    $idBoda = $_GET['idBoda'];
+    $idEncriptado = $_GET['idUsuario'];
+    $id = base64_decode($idEncriptado);
+    $idBodaEncriptado = $_GET['idBoda'];
+    $idBoda = base64_decode($idBodaEncriptado);
     $sqlUsuario = "SELECT * FROM usuarios WHERE id = '$id'";
     $queryUsuario = $Conexion->query($sqlUsuario);
     $row = mysqli_fetch_row($queryUsuario);
@@ -49,9 +51,9 @@ if (isset($_GET['delete'])) {
     $idInvitado = $_GET['delete'];
     $sqlEliminar = "DELETE FROM invitados WHERE id = '$idInvitado'";
     if ($Conexion->query($sqlEliminar)) {
-        echo "<script>alert('Invitado eliminado con éxito'); window.location='invitados.php?idUsuario=$id&idBoda=$idBoda';</script>";
+        echo "<script>alert('Invitado eliminado con éxito'); window.location='invitados.php?idUsuario=$idEncriptado&idBoda=$idBodaEncriptado';</script>";
     } else {
-        echo "<script>alert('Error al eliminar el invitado'); window.location='invitados.php?idUsuario=$id&idBoda=$idBoda';</script>";
+        echo "<script>alert('Error al eliminar el invitado'); window.location='invitados.php?idUsuario=$idEncriptado&idBoda=$idBodaEncriptado';</script>";
     }
 }
 
@@ -118,9 +120,9 @@ if (isset($_POST['updateStatus'])) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Calendario</a>
-                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tabla Kanban</a>
-                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Lista invitados</a>
+                <a class="nav-item nav-link" href="calendario.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Calendario</a>
+                <a class="nav-item nav-link" href="tablaKanban.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tabla Kanban</a>
+                <a class="nav-item nav-link" href="invitados.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Lista invitados</a>
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown1">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -128,8 +130,8 @@ if (isset($_POST['updateStatus'])) {
                             Mensajes
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Notificaciones</a></li>
-                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?> &ind=I">Mensajes</a></li>
+                            <li><a class="dropdown-item" href="notificaciones.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Notificaciones</a></li>
+                            <li><a class="dropdown-item" href="../Chats/listaMensajes.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?> &ind=I">Mensajes</a></li>
                         </ul>
                         </li>
                     </ul>
@@ -141,13 +143,13 @@ if (isset($_POST['updateStatus'])) {
                             Tableros
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tablero general</a></li>
-                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>">Tableros favoritos</a></li>
+                            <li><a class="dropdown-item" href="panelGeneral.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tablero general</a></li>
+                            <li><a class="dropdown-item" href="tablerosFavoritos.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>">Tableros favoritos</a></li>
                         </ul>
                         </li>
                     </ul>
                 </div>
-                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $id; ?>">
+                <a class="navbar-brand" href="infoPerfil.php?idUsuario=<?php echo $idEncriptado; ?>">
                     <img src="../Imagenes/Perfil.png" alt="Perfil" width="30" height="30">
                 </a>
             </div>
@@ -160,7 +162,7 @@ if (isset($_POST['updateStatus'])) {
 
 <center>
 
-<form class="form-inline agregarInvitadoOcultar" action="invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>" method="post">
+<form class="form-inline agregarInvitadoOcultar" action="invitados.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>" method="post">
     <div class="form-floating input-container">
         <input type="text" name="nombreCompleto" pattern="[a-zA-Z ]{2,254}" title="Solo se permiten letras"  class="form-control" id="floatingInput" placeholder="name@example.com">
         <label for="floatingInput">Nombre completo del invitado</label>
@@ -237,7 +239,7 @@ if (isset($_POST['updateStatus'])) {
 <script>
 function confirmDelete(id) {
     if (confirm('¿Estás seguro de que quieres eliminar a este invitado?')) {
-        window.location.href = 'invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>&delete=' + id;
+        window.location.href = 'invitados.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>&delete=' + id;
     }
 }
 
@@ -254,7 +256,7 @@ function confirmEdit(id) {
         const newName = document.getElementById(`editInput_${id}`).value;
         if (newName) {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'invitados.php?idUsuario=<?php echo $id; ?>&idBoda=<?php echo $idBoda; ?>', true);
+            xhr.open('POST', 'invitados.php?idUsuario=<?php echo $idEncriptado; ?>&idBoda=<?php echo $idBodaEncriptado; ?>', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
                 if (xhr.status === 200) {
