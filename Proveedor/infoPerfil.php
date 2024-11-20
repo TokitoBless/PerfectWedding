@@ -11,7 +11,7 @@ if (isset($_GET['id'])) {
     $proveedor = $result->fetch_assoc();
 } else {
     // Redirigir si no hay ID de proveedor
-    header('Location: infoCuenta.php?error="No se proporcionó ID de proveedor"');
+    header('Location: infoPerfil.php?error="No se proporcionó ID de proveedor"');
     exit();
 }
 
